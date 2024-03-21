@@ -13,12 +13,12 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @Getter
 @EntityListeners(EnableJpaAuditing.class)
-public class BaseTime {
+public class BaseTimeEntity {
     @CreatedDate
-    @Column(name = "REGISTER_DATE", nullable = false)
+    @Column(name = "register_date", nullable = false)
     private LocalDateTime registerDate;
 
     @LastModifiedDate
-    @Column(name = "UPDATE_DATE")
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
 }
