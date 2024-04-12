@@ -1,7 +1,7 @@
-package com.jh.EVSherpa.login.repository;
+package com.jh.EVSherpa.repository;
 
-import com.jh.EVSherpa.login.domain.User;
-import com.jh.EVSherpa.login.dto.UserRequestDto;
+import com.jh.EVSherpa.domain.Users;
+import com.jh.EVSherpa.dto.UserRequestDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -16,25 +16,25 @@ import java.util.UUID;
 public class UserRepository {
     private final EntityManager em;
 
-    public User save(UserRequestDto request) {
-        return User.builder()
+    public Users save(UserRequestDto request) {
+        return Users.builder()
                 .userId(request.getUserId())
                 .password(request.getPassword())
                 .build();
     }
 
-    public Optional<User> findById(UUID id) {
-        User findUser = em.find(User.class, id);
+    public Optional<Users> findById(UUID id) {
+        Users findUser = em.find(Users.class, id);
         return Optional.of(findUser);
     }
 
-    public List<User> findAll() {
-        return em.createQuery("SELECT u FROM User u", User.class)
+    public List<Users> findAll() {
+        return em.createQuery("SELECT u FROM User u", Users.class)
                 .getResultList();
     }
 
     public void deleteById(UUID id) {
-        User deleteUser = Optional.ofNullable(em.find(User.class, id))
+        Users deleteUser = Optional.ofNullable(em.find(Users.class, id))
                 .orElseThrow(() -> new EntityNotFoundException("찾을 수 없습니다."));
         em.remove(deleteUser);
     }

@@ -1,4 +1,4 @@
-package com.jh.EVSherpa.login.domain;
+package com.jh.EVSherpa.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

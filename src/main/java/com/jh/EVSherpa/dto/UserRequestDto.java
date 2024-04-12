@@ -1,4 +1,4 @@
-package com.jh.EVSherpa.login.dto;
+package com.jh.EVSherpa.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
