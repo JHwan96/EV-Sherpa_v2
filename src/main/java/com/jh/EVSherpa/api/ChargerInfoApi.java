@@ -1,7 +1,6 @@
 package com.jh.EVSherpa.api;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
 import java.io.IOException;
