@@ -23,7 +23,7 @@ public class ChargerInfoApi {
 //        urlBuilder.append("&" + URLEncoder.encode("zcode","UTF-8") + "=" + URLEncoder.encode("11", "UTF-8")); /*시도 코드 (행정구역코드 앞 2자리)*/
 
         String[] TAG_LIST = {"statNm", "statId", "chgerId", "chgerType", "addr", "lat", "lng", "useTime", "busiId", "bnm",
-                "busiNm", "busiCall", "stat", "output", "method", "zcode", "zscode", "kind", "kindDetail", "parkingFree", "note",
+                "busiNm", "busiCall", "stat", "statUpdDt", "lastTsdt", "lastTedt", "nowTsdt", "output", "method", "zcode", "zscode", "kind", "kindDetail", "parkingFree", "note",
                 "limitYn", "limitDetail", "delYn", "delDetail", "trafficYn"};
 
         String urlStr = urlBuilder.toString();
