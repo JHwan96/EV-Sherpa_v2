@@ -36,6 +36,7 @@ public class ChargerInfoApi {
 
         for (int i = 0; i < nList.getLength(); i++) {
             Node item = nList.item(i);
+            System.out.println("test");
             if (item.getNodeType() == Node.ELEMENT_NODE) {
                 Element e = (Element) item;
                 for (String tag : TAG_LIST) {

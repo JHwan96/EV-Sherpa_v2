@@ -2,6 +2,7 @@ package com.jh.EVSherpa.dto;
 
 import com.jh.EVSherpa.dto.enums.ChargerMethod;
 import com.jh.EVSherpa.dto.enums.ChargerStat;
+import com.jh.EVSherpa.dto.enums.ChargerType;
 import lombok.Builder;
 import lombok.Getter;
 import org.geolatte.geom.Point;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class ChargerInfoApiDto {
+public class ChargerInfoDto {
 /*    String[] TAG_LIST = {"statNm", "statId", "chgerId", "chgerType", "addr", "lat", "lng", "useTime", "busiId", "bnm",
             "busiNm", "busiCall", "stat", "output", "method", "zcode", "zscode", "kind", "kindDetail", "parkingFree", "note",
             "limitYn", "limitDetail", "delYn", "delDetail", "trafficYn"};*/
@@ -18,7 +19,7 @@ public class ChargerInfoApiDto {
     private String stationName;     // 충전소명
     private String stationId;       // 충전소Id
     private String chargerId;       // 충전기ID
-    private String chargerType;     // 충전기타입
+    private ChargerType chargerType;     // 충전기타입
     private String address;         // 주소
     private String location;        // 상세위치
     private Point position;         // 경,위도
