@@ -1,8 +1,9 @@
 package com.jh.EVSherpa.api;
 
-import com.jh.EVSherpa.dto.ChargerStatDto;
+import com.jh.EVSherpa.dto.ChargerStatusDto;
 import com.jh.EVSherpa.global.config.KeyInfo;
 import com.jh.EVSherpa.global.utility.DateTimeUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -16,26 +17,29 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Slf4j
 public class ChargerStatusApi {
     @Autowired
     KeyInfo keyInfo;
-    public List<ChargerStatDto> callChargerStatusApi(){
-//        KeyInfo keyInfo = new KeyInfo();
-        List<ChargerStatDto> apiDto = new ArrayList<>();
-        try {
-            StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/B552584/EvCharger/getChargerStatus"); /*URL*/
-            urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + keyInfo.getServerKey()); /*Service Key*/
-            urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지 번호*/
-            urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수 (최소 10, 최대 9999)*/
-            urlBuilder.append("&" + URLEncoder.encode("period", "UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*상태갱신 조회 범위(분) (기본값 5, 최소 1, 최대 10)*/
-//            urlBuilder.append("&" + URLEncoder.encode("zcode", "UTF-8") + "=" + URLEncoder.encode("11", "UTF-8")); /*시도 코드 (행정구역코드 앞 2자리)*/
 
-            String[] TAG_LIST = {"busiId", "statId", "chgerId", "stat", "statUpdDt", "lastTsdt", "lastTedt", "nowTsdt"};
-            String url = urlBuilder.toString();
+    /**
+     * 충전소 상태 정보 반환 API
+     * @return List<ChargerStatusDto>
+     */
+    public List<ChargerStatusDto> callChargerStatusApi(){
+        List<ChargerStatusDto> apiDto = new ArrayList<>();
+        try {
+            String url = /*URL*/ "http://apis.data.go.kr/B552584/EvCharger/getChargerStatus"
+                    + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=" + keyInfo.getServerKey() /*Service Key*/
+                    + "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("1", StandardCharsets.UTF_8) /*페이지 번호*/
+                    + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("10", StandardCharsets.UTF_8) /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+                    + "&" + URLEncoder.encode("period", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("10", StandardCharsets.UTF_8); /*상태갱신 조회 범위(분) (기본값 5, 최소 1, 최대 10)*/
+//                    + "&" + URLEncoder.encode("zcode", "UTF-8") + "=" + URLEncoder.encode("11", "UTF-8"); /*시도 코드 (행정구역코드 앞 2자리)*/
 
             DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dbuilder = dbfactory.newDocumentBuilder();
@@ -49,10 +53,10 @@ public class ChargerStatusApi {
                 if (item.getNodeType() == Node.ELEMENT_NODE) {
                     Element e = (Element) item;
 
-                    ChargerStatDto check = ChargerStatDto.builder()
-                            .businessId(e.getElementsByTagName("busiId").item(0).getTextContent())
-                            .stationId(e.getElementsByTagName("statId").item(0).getTextContent())
-                            .chargerId(e.getElementsByTagName("chgerId").item(0).getTextContent())
+                    ChargerStatusDto check = ChargerStatusDto.builder()
+                            .businessId(getTextFromTag(e, "busiId"))
+                            .stationId(getTextFromTag(e, "statId"))
+                            .chargerId(getTextFromTag(e, "chgerId"))
                             .stat(getTextFromTag(e, "stat"))
                             .statUpdDt(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "statUpdDt")))
                             .lastTsdt(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "lastTsdt")))
@@ -60,13 +64,12 @@ public class ChargerStatusApi {
                             .nowTsdt(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "nowTsdt")))
                             .build();
                     apiDto.add(check);
-//                System.out.println("chargerId : "+apiDto.size());
                 }
             }
-        } catch (IOException | ParserConfigurationException | SAXException e) {
+        } catch (IOException | ParserConfigurationException | SAXException e) { //TODO: 차후 처리
             e.printStackTrace();
         }
-        System.out.println("chargerId : " + apiDto.size());
+        log.info("apiDto size : {}", apiDto.size());
         return apiDto;
     }
 

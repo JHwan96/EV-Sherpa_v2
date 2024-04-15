@@ -1,7 +1,7 @@
 package com.jh.EVSherpa.application;
 
 import com.jh.EVSherpa.api.ChargerStatusApi;
-import com.jh.EVSherpa.dto.ChargerStatDto;
+import com.jh.EVSherpa.dto.ChargerStatusDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ public class ChargerApiService {
     private final ChargerStatusApi chargerStatusApi;
 
     public int test() {
-        List<ChargerStatDto> chargerStatDtos = chargerStatusApi.callChargerStatusApi();
+        List<ChargerStatusDto> chargerStatDtos = chargerStatusApi.callChargerStatusApi();
         System.out.println(chargerStatDtos.size());
         return chargerStatDtos.size();
     }
