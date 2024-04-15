@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ChargerStat {
     ERROR(1),
-    WAIT(2),
+    FREE(2),
     ING(3),
     STOP(4),
     CHECKING(5),
