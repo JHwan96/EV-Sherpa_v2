@@ -15,4 +15,10 @@ class ChargerApiServiceTest {
         int test = chargerApiService.test();
         Assertions.assertThat(test).isEqualTo(10);
     }
+
+    @Test
+    public void testChargerInfoApi(){
+        int test = chargerApiService.testInfoApi();
+        Assertions.assertThat(test).isEqualTo(10);
+    }
 }

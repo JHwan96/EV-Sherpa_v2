@@ -1,6 +1,9 @@
 package com.jh.EVSherpa.dto.enums;
 
+import com.jh.EVSherpa.exception.NotFoundException;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 public enum ChargerType {
@@ -14,7 +17,14 @@ public enum ChargerType {
 
     private final String code;
 
-    ChargerType(String code){
-        this.code=code;
+    ChargerType(String code) {
+        this.code = code;
+    }
+
+    public static ChargerType of(String chgerType) {
+        return Arrays.stream(ChargerType.values())
+                .filter(chargerType -> chargerType.getCode().equals(chgerType))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("적절한 충전 타입이 없습니다."));
     }
 }

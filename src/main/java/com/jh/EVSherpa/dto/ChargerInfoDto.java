@@ -1,11 +1,12 @@
 package com.jh.EVSherpa.dto;
 
 import com.jh.EVSherpa.dto.enums.ChargerMethod;
-import com.jh.EVSherpa.dto.enums.ChargerStat;
+import com.jh.EVSherpa.dto.enums.ChargerStatus;
 import com.jh.EVSherpa.dto.enums.ChargerType;
 import lombok.Builder;
 import lombok.Getter;
-import org.geolatte.geom.Point;
+import org.locationtech.jts.geom.Point;
+
 
 import java.time.LocalDateTime;
 
@@ -28,7 +29,7 @@ public class ChargerInfoDto {
     private String bName;           // 기관명
     private String businessName;    // 운영기관명
     private String businessCall;    // 운영기관 연락처
-    private ChargerStat stat;            // 충전기 상태
+    private ChargerStatus stat;            // 충전기 상태
     private LocalDateTime stationUpdateDt;  // 상태 갱신 일시
     private LocalDateTime lastTsDt;         // 마지막 충전시작일시
     private LocalDateTime lastTeDt;         // 마지막 충전종료일시
