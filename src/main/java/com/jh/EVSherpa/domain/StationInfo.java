@@ -1,5 +1,6 @@
 package com.jh.EVSherpa.domain;
 
+import com.jh.EVSherpa.dto.StationInfoDto;
 import com.jh.EVSherpa.dto.enums.ChargerMethod;
 import com.jh.EVSherpa.dto.enums.ChargerType;
 import jakarta.persistence.Column;
@@ -13,6 +14,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -20,6 +23,9 @@ import org.locationtech.jts.geom.Point;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+
 public class StationInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,4 +63,34 @@ public class StationInfo {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_status_id")
     private StationStatus stationStatus;
+
+    public static StationInfo create(StationInfoDto dto, StationStatus stationStatus) {
+        return StationInfo.builder()
+                .stationName(dto.getStationName())
+                .stationChargerId(dto.getStationChargerId())
+                .chargerType(dto.getChargerType())
+                .address(dto.getAddress())
+                .location(dto.getLocation())
+                .point(dto.getPosition())
+                .useTime(dto.getUseTime())
+                .businessId(dto.getBusinessId())
+                .businessName(dto.getBusinessName())
+                .operatorCall(dto.getOperatorCall())
+                .operatorName(dto.getOperatorName())
+                .output(dto.getOutput())
+                .chargerMethod(dto.getChargerMethod())
+                .zcode(dto.getZcode())
+                .zscode(dto.getZscode())
+                .kind(dto.getKind())
+                .kindDetail(dto.getKindDetail())
+                .parkingFree(dto.getParkingFree())
+                .notation(dto.getNotation())
+                .limitYn(dto.getLimitYn())
+                .limitDetail(dto.getLimitDetail())
+                .deleteYn(dto.getDeleteYn())
+                .deleteDetail(dto.getDeleteDetail())
+                .trafficYn(dto.getTrafficYn())
+                .stationStatus(stationStatus)
+                .build();
+    }
 }

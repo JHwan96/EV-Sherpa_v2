@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 public class StationStatusDto {
     private String businessId;
-    private String stationId;
-    private String chargerId;
+    private String stationChargerId;       // 충전소+충전기 Id
     private String stat;
     private LocalDateTime statUpdDt;
     private LocalDateTime lastTsdt;

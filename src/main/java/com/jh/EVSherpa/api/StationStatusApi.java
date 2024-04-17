@@ -57,8 +57,7 @@ public class StationStatusApi {
 
                     StationStatusDto check = StationStatusDto.builder()
                             .businessId(getTextFromTag(e, "busiId"))
-                            .stationId(getTextFromTag(e, "statId"))
-                            .chargerId(getTextFromTag(e, "chgerId"))
+                            .stationChargerId(getTextFromTag(e, "statId")+getTextFromTag(e, "chgerId"))
                             .stat(getTextFromTag(e, "stat"))
                             .statUpdDt(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "statUpdDt")))
                             .lastTsdt(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "lastTsdt")))
