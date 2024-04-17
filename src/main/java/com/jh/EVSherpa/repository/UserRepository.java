@@ -17,15 +17,18 @@ public class UserRepository {
     private final EntityManager em;
 
     public Users save(UserRequestDto request) {
-        return Users.builder()
+
+        Users user = Users.builder()
                 .userId(request.getUserId())
                 .password(request.getPassword())
                 .build();
+        em.persist(user);
+        return user;
     }
 
     public Optional<Users> findById(UUID id) {
         Users findUser = em.find(Users.class, id);
-        return Optional.of(findUser);
+        return Optional.ofNullable(findUser);
     }
 
     public List<Users> findAll() {
@@ -35,7 +38,7 @@ public class UserRepository {
 
     public void deleteById(UUID id) {
         Users deleteUser = Optional.ofNullable(em.find(Users.class, id))
-                .orElseThrow(() -> new EntityNotFoundException("찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("삭제 실패: 유저를 찾을 수 없습니다."));
         em.remove(deleteUser);
     }
 

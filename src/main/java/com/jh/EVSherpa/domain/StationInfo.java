@@ -55,6 +55,6 @@ public class StationInfo {
     private String trafficYn;       // 편의제공 여부
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="station_status_id")
+    @JoinColumn(name = "station_status_id")
     private StationStatus stationStatus;
 }

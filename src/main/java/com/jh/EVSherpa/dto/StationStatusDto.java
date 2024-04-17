@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class ChargerStatusDto {
+public class StationStatusDto {
     private String businessId;
     private String stationId;
     private String chargerId;

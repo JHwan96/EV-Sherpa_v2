@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class ChargerInfoDto {
+public class StationInfoDto {
     private String stationName;     // 충전소명
     private String stationChargerId;       // 충전소+충전기 Id
     private ChargerType chargerType;     // 충전기타입

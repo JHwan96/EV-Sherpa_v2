@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ChargerApiServiceTest {
+class StationApiServiceTest {
     @Autowired
-    ChargerApiService chargerApiService;
+    StationApiService chargerApiService;
 
     @Test
     public void test() {

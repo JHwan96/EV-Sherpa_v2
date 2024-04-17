@@ -1,6 +1,6 @@
 package com.jh.EVSherpa.api;
 
-import com.jh.EVSherpa.dto.ChargerInfoDto;
+import com.jh.EVSherpa.dto.StationInfoDto;
 import com.jh.EVSherpa.dto.enums.ChargerMethod;
 import com.jh.EVSherpa.dto.enums.ChargerStatus;
 import com.jh.EVSherpa.dto.enums.ChargerType;
@@ -29,12 +29,12 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class ChargerInfoApi {
+public class StationInfoApi {
     @Autowired
     KeyInfo keyInfo;
 
-    public List<ChargerInfoDto> callChargerInfoApi() {
-        List<ChargerInfoDto> apiDto = new ArrayList<>();
+    public List<StationInfoDto> callStationInfoApi() {
+        List<StationInfoDto> apiDto = new ArrayList<>();
 
         String url = /*URL*/ "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
                 + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=" + keyInfo.getServerKey() /*Service Key*/
@@ -54,7 +54,7 @@ public class ChargerInfoApi {
                 Node item = nList.item(i);
                 if (item.getNodeType() == Node.ELEMENT_NODE) {
                     Element element = (Element) item;
-                    ChargerInfoDto dto = buildChargerInfoDto(element);
+                    StationInfoDto dto = buildStationInfoDto(element);
                     apiDto.add(dto);
                 }
             }
@@ -66,8 +66,8 @@ public class ChargerInfoApi {
     }
 
     //ChargerInfoDto 생성 메서드
-    private ChargerInfoDto buildChargerInfoDto(Element element) {
-        return ChargerInfoDto.builder()
+    private StationInfoDto buildStationInfoDto(Element element) {
+        return StationInfoDto.builder()
                 .stationName(getTextFromTag(element, "statNm"))
                 .stationChargerId(getTextFromTag(element, "statId") + getTextFromTag(element, "chgerId"))
                 .chargerType(ChargerType.of(getTextFromTag(element, "chgerType")))

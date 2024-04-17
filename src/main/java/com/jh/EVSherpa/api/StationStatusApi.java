@@ -1,6 +1,6 @@
 package com.jh.EVSherpa.api;
 
-import com.jh.EVSherpa.dto.ChargerStatusDto;
+import com.jh.EVSherpa.dto.StationStatusDto;
 import com.jh.EVSherpa.global.config.KeyInfo;
 import com.jh.EVSherpa.global.utility.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class ChargerStatusApi {
+public class StationStatusApi {
     @Autowired
     KeyInfo keyInfo;
 
@@ -32,8 +32,8 @@ public class ChargerStatusApi {
      *
      * @return List<ChargerStatusDto>
      */
-    public List<ChargerStatusDto> callChargerStatusApi() {
-        List<ChargerStatusDto> apiDto = new ArrayList<>();
+    public List<StationStatusDto> callChargerStatusApi() {
+        List<StationStatusDto> apiDto = new ArrayList<>();
 
         String url = /*URL*/ "http://apis.data.go.kr/B552584/EvCharger/getChargerStatus"
                 + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=" + keyInfo.getServerKey() /*Service Key*/
@@ -55,7 +55,7 @@ public class ChargerStatusApi {
                 if (item.getNodeType() == Node.ELEMENT_NODE) {
                     Element e = (Element) item;
 
-                    ChargerStatusDto check = ChargerStatusDto.builder()
+                    StationStatusDto check = StationStatusDto.builder()
                             .businessId(getTextFromTag(e, "busiId"))
                             .stationId(getTextFromTag(e, "statId"))
                             .chargerId(getTextFromTag(e, "chgerId"))
