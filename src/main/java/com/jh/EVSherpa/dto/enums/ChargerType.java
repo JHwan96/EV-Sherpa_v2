@@ -13,7 +13,9 @@ public enum ChargerType {
     DC_COMBO("04"),
     DC_CHA_DC_COMBO("05"),
     DC_CHA_AC3_SANG_DC_COMBO("06"),
-    AC3_SANG("07");
+    AC3_SANG("07"),
+    DC_COMBO_NORMAL("08"),
+    H2("89");
 
     private final String code;
 

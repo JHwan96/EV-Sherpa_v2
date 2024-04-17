@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 @Getter
 public enum ChargerStatus {
+    UNKNOWN(0),
     ERROR(1),
     FREE(2),
     ING(3),

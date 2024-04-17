@@ -29,17 +29,19 @@ public class ChargerStatusApi {
 
     /**
      * 충전소 상태 정보 반환 API
+     *
      * @return List<ChargerStatusDto>
      */
-    public List<ChargerStatusDto> callChargerStatusApi(){
+    public List<ChargerStatusDto> callChargerStatusApi() {
         List<ChargerStatusDto> apiDto = new ArrayList<>();
 
-            String url = /*URL*/ "http://apis.data.go.kr/B552584/EvCharger/getChargerStatus"
-                    + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=" + keyInfo.getServerKey() /*Service Key*/
-                    + "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("1", StandardCharsets.UTF_8) /*페이지 번호*/
-                    + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("10", StandardCharsets.UTF_8) /*한 페이지 결과 수 (최소 10, 최대 9999)*/
-                    + "&" + URLEncoder.encode("period", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("10", StandardCharsets.UTF_8); /*상태갱신 조회 범위(분) (기본값 5, 최소 1, 최대 10)*/
+        String url = /*URL*/ "http://apis.data.go.kr/B552584/EvCharger/getChargerStatus"
+                + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=" + keyInfo.getServerKey() /*Service Key*/
+                + "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("1", StandardCharsets.UTF_8) /*페이지 번호*/
+                + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("10", StandardCharsets.UTF_8) /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+                + "&" + URLEncoder.encode("period", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("10", StandardCharsets.UTF_8); /*상태갱신 조회 범위(분) (기본값 5, 최소 1, 최대 10)*/
 //                    + "&" + URLEncoder.encode("zcode", "UTF-8") + "=" + URLEncoder.encode("11", "UTF-8"); /*시도 코드 (행정구역코드 앞 2자리)*/
+        System.out.println(url);
         try {
             DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dbuilder = dbfactory.newDocumentBuilder();

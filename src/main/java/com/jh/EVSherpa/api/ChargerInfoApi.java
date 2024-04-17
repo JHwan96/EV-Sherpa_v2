@@ -69,8 +69,7 @@ public class ChargerInfoApi {
     private ChargerInfoDto buildChargerInfoDto(Element element) {
         return ChargerInfoDto.builder()
                 .stationName(getTextFromTag(element, "statNm"))
-                .stationId(getTextFromTag(element, "statId"))
-                .chargerId(getTextFromTag(element, "chgerId"))
+                .stationChargerId(getTextFromTag(element, "statId") + getTextFromTag(element, "chgerId"))
                 .chargerType(ChargerType.of(getTextFromTag(element, "chgerType")))
                 .address(getTextFromTag(element, "addr"))
                 .location(getTextFromTag(element, "location"))
@@ -105,11 +104,12 @@ public class ChargerInfoApi {
     }
 
     private Point getPositionFromString(String latitude, String longitude) { //TODO: Utility로 이동 고려
+        GeometryFactory geometryFactory = new GeometryFactory();
         double lat = Double.parseDouble(latitude);
         double lng = Double.parseDouble(longitude);
-        GeometryFactory geometryFactory = new GeometryFactory();
         Point point = geometryFactory.createPoint(new Coordinate(lng, lat));
-        point.setSRID(4326);
+        int SRID = 4326;
+        point.setSRID(SRID);
 
         return point;
     }

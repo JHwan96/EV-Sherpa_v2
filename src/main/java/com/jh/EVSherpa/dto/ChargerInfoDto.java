@@ -7,19 +7,13 @@ import lombok.Builder;
 import lombok.Getter;
 import org.locationtech.jts.geom.Point;
 
-
 import java.time.LocalDateTime;
 
 @Getter
 @Builder
 public class ChargerInfoDto {
-/*    String[] TAG_LIST = {"statNm", "statId", "chgerId", "chgerType", "addr", "lat", "lng", "useTime", "busiId", "bnm",
-            "busiNm", "busiCall", "stat", "output", "method", "zcode", "zscode", "kind", "kindDetail", "parkingFree", "note",
-            "limitYn", "limitDetail", "delYn", "delDetail", "trafficYn"};*/
-
     private String stationName;     // 충전소명
-    private String stationId;       // 충전소Id
-    private String chargerId;       // 충전기ID
+    private String stationChargerId;       // 충전소+충전기 Id
     private ChargerType chargerType;     // 충전기타입
     private String address;         // 주소
     private String location;        // 상세위치
