@@ -23,7 +23,7 @@ public class StationInfoDto {
     private String businessName;           // 기관명
     private String operatorName;    // 운영기관명
     private String operatorCall;    // 운영기관 연락처
-    private ChargerStatus stat;            // 충전기 상태
+    private ChargerStatus status;            // 충전기 상태
     private LocalDateTime stationUpdateDate;  // 상태 갱신 일시
     private LocalDateTime lastChargeStart;         // 마지막 충전시작일시
     private LocalDateTime lastChargeEnd;         // 마지막 충전종료일시

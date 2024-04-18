@@ -64,7 +64,7 @@ public class StationInfo {
     @JoinColumn(name = "station_status_id")
     private StationStatus stationStatus;
 
-    public static StationInfo create(StationInfoDto dto, StationStatus stationStatus) {
+    public static StationInfo fromDto(StationInfoDto dto, StationStatus stationStatus) {
         return StationInfo.builder()
                 .stationName(dto.getStationName())
                 .stationChargerId(dto.getStationChargerId())

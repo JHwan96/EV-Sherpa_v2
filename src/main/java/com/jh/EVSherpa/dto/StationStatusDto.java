@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 public class StationStatusDto {
     private String businessId;
     private String stationChargerId;       // 충전소+충전기 Id
-    private String stat;
-    private LocalDateTime statUpdDt;
-    private LocalDateTime lastTsdt;
-    private LocalDateTime lastTedt;
-    private LocalDateTime nowTsdt;
+    private String status;
+    private LocalDateTime stationUpdateDate;
+    private LocalDateTime lastChargeStart;
+    private LocalDateTime lastChargeEnd;
+    private LocalDateTime nowChargeStart;
 }

@@ -1,5 +1,6 @@
 package com.jh.EVSherpa.domain;
 
+import com.jh.EVSherpa.dto.StationInfoDto;
 import com.jh.EVSherpa.dto.enums.ChargerStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,12 +11,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Builder
 public class StationStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,4 +36,14 @@ public class StationStatus {
 
     @OneToOne(mappedBy = "stationStatus", fetch = FetchType.LAZY)
     private StationInfo stationInfo;
+
+    public static StationStatus fromInfoDto(StationInfoDto dto){
+        return StationStatus.builder()
+                .status(dto.getStatus())
+                .stationUpdateDate(dto.getStationUpdateDate())
+                .lastChargeStart(dto.getLastChargeStart())
+                .lastChargeEnd(dto.getLastChargeEnd())
+                .nowChargeStart(dto.getNowChargeStart())
+                .build();
+    }
 }
