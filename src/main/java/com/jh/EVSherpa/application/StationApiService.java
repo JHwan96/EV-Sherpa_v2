@@ -27,16 +27,16 @@ public class StationApiService {
         return stationStatusDtos.size();
     }
 
-    public int testInfoApi() {
-        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
-
-        log.info("chargerInfoDtos size : {}", stationInfoDtos.size());
-        return stationInfoDtos.size();
-    }
-
     // api 호출 및 repository 저장 메서드
     public List<StationInfo> saveStationInfo() {
+        log.info("saveStationInfo start");
+        long start = System.currentTimeMillis();
+
         List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
+
+        long end = System.currentTimeMillis();
+        log.info("saveStationInfo  : {}s", (float) (end - start) / 1000);
+
         return stationInfoRepository.saveAll(stationInfoDtos);
     }
 }

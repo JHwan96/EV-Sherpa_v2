@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class StationInfoRepository {
-    private EntityManager em;
+    private final EntityManager em;
 
     public StationInfo save(StationInfoDto request) {
         StationStatus stationStatus = StationStatus.fromInfoDto(request);
