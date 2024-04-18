@@ -28,7 +28,7 @@ public class StationInfoDto {
     private LocalDateTime lastChargeStart;         // 마지막 충전시작일시
     private LocalDateTime lastChargeEnd;         // 마지막 충전종료일시
     private LocalDateTime nowChargeStart;          // 충전중 시작일시
-    private int output;         // 충전 용량
+    private Integer output;         // 충전 용량
     private ChargerMethod chargerMethod;      // 충전방식 (단독/동시)
     private String zcode;       // 지역 코드
     private String zscode;      // 지역구분 상세코드

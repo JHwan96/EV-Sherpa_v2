@@ -11,7 +11,10 @@ public enum ChargerMethod {
             return ChargerMethod.SINGLE;
         } else if (method.equals("동시")) {
             return ChargerMethod.CONCURRENT;
-        } else {
+        } else if (method.isBlank()) {
+            return null;
+        }
+        else {
             throw new NotFoundException("일치하는 충전 방식이 없습니다.");
         }
     }

@@ -30,7 +30,6 @@ public class StationStatusApi {
 
     /**
      * 충전소 상태 정보 반환 API
-     *
      * @return List<ChargerStatusDto>
      */
     public List<StationStatusDto> callChargerStatusApi() {

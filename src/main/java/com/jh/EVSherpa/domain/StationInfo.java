@@ -45,7 +45,7 @@ public class StationInfo {
     private String businessName;           // 기관명
     private String operatorName;    // 운영기관명
     private String operatorCall;    // 운영기관 연락처
-    private int output;         // 충전 용량
+    private Integer output;         // 충전 용량
     @Enumerated(value = EnumType.STRING)
     private ChargerMethod chargerMethod;      // 충전방식 (단독/동시)
     private String zcode;       // 지역 코드

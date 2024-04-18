@@ -32,10 +32,11 @@ public class StationApiService {
         log.info("saveStationInfo start");
         long start = System.currentTimeMillis();
 
+        // api 호출 - StationInfo
         List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
 
         long end = System.currentTimeMillis();
-        log.info("saveStationInfo  : {}s", (float) (end - start) / 1000);
+        log.info("Api 호출 시간  : {}s", (float) (end - start) / 1000);
 
         return stationInfoRepository.saveAll(stationInfoDtos);
     }

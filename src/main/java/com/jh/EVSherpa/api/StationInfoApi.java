@@ -84,7 +84,7 @@ public class StationInfoApi {
                 .lastChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "lastTsdt")))
                 .lastChargeEnd(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "lastTedt")))
                 .nowChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "nowTsdt")))
-                .output(Integer.parseInt(getTextFromTag(element, "output")))
+                .output(integerToString(element, "output"))
                 .chargerMethod(ChargerMethod.of(getTextFromTag(element, "method")))
                 .zcode(getTextFromTag(element, "zcode"))
                 .kind(getTextFromTag(element, "kind"))
@@ -97,6 +97,15 @@ public class StationInfoApi {
                 .deleteDetail(getTextFromTag(element, "delDetail"))
                 .trafficYn(getTextFromTag(element, "trafficYn"))
                 .build();
+    }
+
+    private Integer integerToString(Element element, String tag) {
+        String output = getTextFromTag(element, tag);
+        if(output.isEmpty()){
+            return null;
+        } else {
+            return Integer.parseInt(output);
+        }
     }
 
     private String getTextFromTag(Element element, String tag) {
