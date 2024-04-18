@@ -1,6 +1,8 @@
 package com.jh.EVSherpa.domain;
 
 import com.jh.EVSherpa.dto.StationInfoDto;
+import com.jh.EVSherpa.dto.StationStatusDto;
+import com.jh.EVSherpa.dto.StationStatusUpdateDto;
 import com.jh.EVSherpa.dto.enums.ChargerStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +39,25 @@ public class StationStatus {
     @OneToOne(mappedBy = "stationStatus", fetch = FetchType.LAZY)
     private StationInfo stationInfo;
 
+    public void updateStatus(StationStatusUpdateDto request) {
+        this.status = request.getStatus();
+        this.stationUpdateDate = request.getStationUpdateDate();
+        this.lastChargeStart = request.getLastChargeStart();
+        this.lastChargeEnd = request.getLastChargeEnd();
+        this.nowChargeStart = request.getNowChargeStart();
+    }
+
     public static StationStatus fromInfoDto(StationInfoDto dto){
+        return StationStatus.builder()
+                .status(dto.getStatus())
+                .stationUpdateDate(dto.getStationUpdateDate())
+                .lastChargeStart(dto.getLastChargeStart())
+                .lastChargeEnd(dto.getLastChargeEnd())
+                .nowChargeStart(dto.getNowChargeStart())
+                .build();
+    }
+
+    public static StationStatus fromStatusDto(StationStatusDto dto){
         return StationStatus.builder()
                 .status(dto.getStatus())
                 .stationUpdateDate(dto.getStationUpdateDate())

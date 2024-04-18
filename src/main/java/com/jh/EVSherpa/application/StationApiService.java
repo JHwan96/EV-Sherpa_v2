@@ -2,6 +2,7 @@ package com.jh.EVSherpa.application;
 
 import com.jh.EVSherpa.api.StationInfoApi;
 import com.jh.EVSherpa.api.StationStatusApi;
+import com.jh.EVSherpa.domain.StationInfo;
 import com.jh.EVSherpa.dto.StationInfoDto;
 import com.jh.EVSherpa.dto.StationStatusDto;
 import com.jh.EVSherpa.repository.StationInfoRepository;
@@ -26,10 +27,16 @@ public class StationApiService {
         return stationStatusDtos.size();
     }
 
-    public int testInfoApi(){
+    public int testInfoApi() {
         List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
 
         log.info("chargerInfoDtos size : {}", stationInfoDtos.size());
         return stationInfoDtos.size();
+    }
+
+    // api 호출 및 repository 저장 메서드
+    public List<StationInfo> saveStationInfo() {
+        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
+        return stationInfoRepository.saveAll(stationInfoDtos);
     }
 }

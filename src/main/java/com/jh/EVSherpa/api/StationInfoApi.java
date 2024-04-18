@@ -79,7 +79,7 @@ public class StationInfoApi {
                 .businessName(getTextFromTag(element, "bnm"))
                 .operatorName(getTextFromTag(element, "busiNm"))
                 .operatorCall(getTextFromTag(element, "busiCall"))
-                .stat(ChargerStatus.of(getTextFromTag(element, "stat")))
+                .status(ChargerStatus.of(getTextFromTag(element, "stat")))
                 .stationUpdateDate(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "statUpdDt")))
                 .lastChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "lastTsdt")))
                 .lastChargeEnd(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "lastTedt")))

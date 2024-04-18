@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,18 @@ public class StationInfoRepository {
         StationInfo stationInfo = StationInfo.fromDto(request, stationStatus);
         em.persist(stationInfo);
         return stationInfo;
+    }
+
+    //전체 저장 메서드
+    public List<StationInfo> saveAll(List<StationInfoDto> requests){
+        List<StationInfo> stationInfos = new ArrayList<>();
+        for(StationInfoDto request : requests){
+            StationStatus stationStatus = StationStatus.fromInfoDto(request);
+            StationInfo stationInfo = StationInfo.fromDto(request, stationStatus);
+            em.persist(stationInfo);
+            stationInfos.add(stationInfo);
+        }
+        return stationInfos;
     }
 
     public Optional<StationInfo> findById(Long id) {

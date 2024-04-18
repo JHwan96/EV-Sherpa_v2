@@ -1,6 +1,7 @@
 package com.jh.EVSherpa.api;
 
 import com.jh.EVSherpa.dto.StationStatusDto;
+import com.jh.EVSherpa.dto.enums.ChargerStatus;
 import com.jh.EVSherpa.global.config.KeyInfo;
 import com.jh.EVSherpa.global.utility.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -58,11 +59,11 @@ public class StationStatusApi {
                     StationStatusDto check = StationStatusDto.builder()
                             .businessId(getTextFromTag(e, "busiId"))
                             .stationChargerId(getTextFromTag(e, "statId")+getTextFromTag(e, "chgerId"))
-                            .stat(getTextFromTag(e, "stat"))
-                            .statUpdDt(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "statUpdDt")))
-                            .lastTsdt(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "lastTsdt")))
-                            .lastTedt(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "lastTedt")))
-                            .nowTsdt(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "nowTsdt")))
+                            .status(ChargerStatus.of(getTextFromTag(e, "stat")))
+                            .stationUpdateDate(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "statUpdDt")))
+                            .lastChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "lastTsdt")))
+                            .lastChargeEnd(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "lastTedt")))
+                            .nowChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "nowTsdt")))
                             .build();
                     apiDto.add(check);
                 }
