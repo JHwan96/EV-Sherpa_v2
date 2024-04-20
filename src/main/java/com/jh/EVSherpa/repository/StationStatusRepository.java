@@ -1,12 +1,14 @@
 package com.jh.EVSherpa.repository;
 
 import com.jh.EVSherpa.domain.StationStatus;
+import com.jh.EVSherpa.dto.StationStatusDto;
 import com.jh.EVSherpa.dto.StationStatusUpdateDto;
 import com.jh.EVSherpa.exception.NotFoundException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,19 @@ public class StationStatusRepository {
     public StationStatus save(Long id) {
         return em.find(StationStatus.class, id);
     }
+
+    //전체 저장 메서드
+    public List<StationStatus> saveAll(List<StationStatusDto> requests){
+        List<StationStatus> statuses = new ArrayList<>();       // TODO: 나중에 필요없을지 확인
+        for(StationStatusDto request : requests) {
+            StationStatus stationStatus = StationStatus.fromStatusDto(request);
+            em.persist(stationStatus);
+            statuses.add(stationStatus);
+        }
+        return statuses;
+    }
+
+
 
     public Optional<StationStatus> findById(Long id) {
         return Optional.ofNullable(em.find(StationStatus.class, id));
