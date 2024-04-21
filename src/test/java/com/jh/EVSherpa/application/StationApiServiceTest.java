@@ -17,12 +17,6 @@ class StationApiServiceTest {
     @Autowired
     StationApiService stationApiService;
 
-    @Test
-    public void test() {
-        int test = stationApiService.test();
-        Assertions.assertThat(test).isEqualTo(10);
-    }
-
     @Nested
     @DisplayName("StationInfoApi를 호출할 때")
     class StationInfoTest {

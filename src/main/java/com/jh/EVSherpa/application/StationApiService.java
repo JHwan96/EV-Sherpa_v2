@@ -23,13 +23,6 @@ public class StationApiService {
     private final StationInfoRepository stationInfoRepository;
     private final StationStatusRepository stationStatusRepository;
 
-    public int test() {
-        List<StationStatusDto> stationStatusDtos = stationStatusApi.callStationStatusApi();
-
-        System.out.println(stationStatusDtos.size());
-        return stationStatusDtos.size();
-    }
-
     /**
      * StationStatus 호출 및 저장 메서드 (처음 저장할 때만 사용)
      * @return StationStatus의 리스트
@@ -60,8 +53,14 @@ public class StationApiService {
     public int saveStationInfo() {
         log.info("saveStationInfo() start");
 
+        log.info("callStationInfo start");      //TODO: 차후 제거
+        long apiStart = System.currentTimeMillis();
+
         // api 호출 - StationInfo
-        List<StationInfoDto> stationInfoDtos = callStationInfo();
+        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
+        long apiEnd = System.currentTimeMillis();
+        log.info("API 호출 시간 : {}s", (float)(apiEnd-apiStart)/1000);
+
 
         log.info("데이터 저장 start");
         long start = System.currentTimeMillis();
@@ -72,17 +71,5 @@ public class StationApiService {
         log.info("데이터 저장 시간 : {}s", (float) (end - start) / 1000);
 
         return stationInfos.size();
-    }
-
-    private List<StationInfoDto> callStationInfo(){
-        log.info("callStationInfo start");      //TODO: 차후 제거
-        long start = System.currentTimeMillis();
-
-        // api 호출 - StationInfo
-        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
-
-        long end = System.currentTimeMillis();
-        log.info("API 호출 시간 : {}s", (float)(end-start)/1000);
-        return stationInfoDtos;
     }
 }
