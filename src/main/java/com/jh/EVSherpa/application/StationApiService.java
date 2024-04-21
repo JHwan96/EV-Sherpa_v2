@@ -9,66 +9,34 @@ import com.jh.EVSherpa.dto.StationStatusDto;
 import com.jh.EVSherpa.repository.StationInfoRepository;
 import com.jh.EVSherpa.repository.StationStatusRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class StationApiService {
     private final StationStatusApi stationStatusApi;
     private final StationInfoApi stationInfoApi;
     private final StationInfoRepository stationInfoRepository;
     private final StationStatusRepository stationStatusRepository;
 
-    /**
-     * StationStatus 호출 및 저장 메서드 (처음 저장할 때만 사용)
-     * @return StationStatus의 리스트
-     */
-    public List<StationStatus> saveStationStatus(){
-        log.info("saveStationStatus start");
-
+    //StationStatus 호출 및 저장 메서드 (처음 저장할 때만 사용)
+    public List<StationStatus> saveStationStatus() {
         // api 호출 - StationStatus
-        log.info("StationStatusApi start");
-        long start = System.currentTimeMillis();
         List<StationStatusDto> stationStatusDtos = stationStatusApi.callStationStatusApi();
-        long end = System.currentTimeMillis();
-        log.info("API 호출 시간 : {}s", (float)(end-start)/1000);
 
-        log.info("데이터 저장 start");
-        long saveStart = System.currentTimeMillis();
-        List<StationStatus> result = stationStatusRepository.saveAll(stationStatusDtos);
-        long saveEnd = System.currentTimeMillis();
-        log.info("데이터 저장시간 : {}s", (saveEnd-saveStart)/1000);
-
-        return result;
+        // 데이터 저장
+        return stationStatusRepository.saveAll(stationStatusDtos);
     }
 
-    /**
-     * StationInfoApi 호출 및 저장 메서드 (처음 저장할 때만 사용)
-     * @return 저장된 갯수 (차후 변경)
-     */
+    // StationInfoApi 호출 및 저장 메서드 (처음 저장할 때만 사용)
     public int saveStationInfo() {
-        log.info("saveStationInfo() start");
-
-        log.info("callStationInfo start");      //TODO: 차후 제거
-        long apiStart = System.currentTimeMillis();
-
         // api 호출 - StationInfo
         List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
-        long apiEnd = System.currentTimeMillis();
-        log.info("API 호출 시간 : {}s", (float)(apiEnd-apiStart)/1000);
-
-
-        log.info("데이터 저장 start");
-        long start = System.currentTimeMillis();
 
         // 전체 저장 실행
         List<StationInfo> stationInfos = stationInfoRepository.saveAll(stationInfoDtos);
-        long end = System.currentTimeMillis();
-        log.info("데이터 저장 시간 : {}s", (float) (end - start) / 1000);
 
         return stationInfos.size();
     }
