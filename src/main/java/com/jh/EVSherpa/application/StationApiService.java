@@ -32,7 +32,7 @@ public class StationApiService {
 
     /**
      * StationStatus 호출 및 저장 메서드 (처음 저장할 때만 사용)
-     * @return
+     * @return StationStatus의 리스트
      */
     public List<StationStatus> saveStationStatus(){
         log.info("saveStationStatus start");
@@ -40,13 +40,13 @@ public class StationApiService {
         // api 호출 - StationStatus
         log.info("StationStatusApi start");
         long start = System.currentTimeMillis();
-        List<StationStatusDto> stationStatuses = stationStatusApi.callStationStatusApi();
+        List<StationStatusDto> stationStatusDtos = stationStatusApi.callStationStatusApi();
         long end = System.currentTimeMillis();
         log.info("API 호출 시간 : {}s", (float)(end-start)/1000);
 
         log.info("데이터 저장 start");
         long saveStart = System.currentTimeMillis();
-        List<StationStatus> result = stationStatusRepository.saveAll(stationStatuses);
+        List<StationStatus> result = stationStatusRepository.saveAll(stationStatusDtos);
         long saveEnd = System.currentTimeMillis();
         log.info("데이터 저장시간 : {}s", (saveEnd-saveStart)/1000);
 

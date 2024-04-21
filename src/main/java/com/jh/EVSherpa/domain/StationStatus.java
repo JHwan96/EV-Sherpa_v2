@@ -59,6 +59,7 @@ public class StationStatus {
 
     public static StationStatus fromStatusDto(StationStatusDto dto){
         return StationStatus.builder()
+                .stationChargerId(dto.getStationChargerId())
                 .status(dto.getStatus())
                 .stationUpdateDate(dto.getStationUpdateDate())
                 .lastChargeStart(dto.getLastChargeStart())
