@@ -3,6 +3,7 @@ package com.jh.EVSherpa.repository;
 import com.jh.EVSherpa.domain.StationInfo;
 import com.jh.EVSherpa.domain.StationStatus;
 import com.jh.EVSherpa.dto.StationInfoDto;
+import com.jh.EVSherpa.dto.StationInfoUpdateDto;
 import com.jh.EVSherpa.exception.NotFoundException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +26,9 @@ public class StationInfoRepository {
     }
 
     //전체 저장 메서드
-    public List<StationInfo> saveAll(List<StationInfoDto> requests){
+    public List<StationInfo> saveAll(List<StationInfoDto> requests) {
         List<StationInfo> stationInfos = new ArrayList<>();
-        for(StationInfoDto request : requests){
+        for (StationInfoDto request : requests) {
             StationStatus stationStatus = StationStatus.fromInfoDto(request);
             StationInfo stationInfo = StationInfo.fromDto(request, stationStatus);
             em.persist(stationInfo);
@@ -41,25 +42,36 @@ public class StationInfoRepository {
         return Optional.ofNullable(stationInfo);
     }
 
-    /**
-     * 전체 find 메서드
-     *
-     * @return 찾은 StationInfo 리스트
-     */
+    public StationInfo findByStationChargerId(String stationChargerId) {
+        return Optional.of(em.createQuery("SELECT si FROM StationInfo si WHERE si.stationChargerId = :stationChargerId", StationInfo.class)
+                        .setParameter("stationChargerId", stationChargerId)
+                        .getSingleResult())
+                .orElseThrow(() -> new NotFoundException("적절한 충전소 정보가 없습니다."));
+    }
+
+    // 전체 find 메서드
     public List<StationInfo> findAll() {
         return em.createQuery("SELECT si FROM StationInfo si", StationInfo.class)
                 .getResultList();
     }
 
-    //TODO: update 필요할 때 작성
-//    public StationInfo updateById(StationInfoUpdateDto request, Long id)
+    //TODO: 성능 비교 후 하나로 확정
+    public List<StationInfo> updateAllByDirtyChecking(List<StationInfoUpdateDto> requests) {
+        List<StationInfo> stationInfos = new ArrayList<>();
+        for (StationInfoUpdateDto request : requests) {
+            StationInfo stationInfo = em.createQuery("SELECT si FROM StationInfo si WHERE si.stationChargerId = :stationChargerId", StationInfo.class)
+                    .setParameter("stationChargerId", request.getStationChargerId())
+                    .getSingleResult();
+            stationInfo.updateStationInfo(request);
+            stationInfos.add(stationInfo);
+        }
+        return stationInfos;
+    }
 
-    /**
-     * 삭제 메서드
-     *
-     * @param id
-     * @return 삭제된 StationInfo
-     */
+
+
+
+    //삭제 메서드
     public StationInfo deleteById(Long id) {
         Optional<StationInfo> findId = findById(id);
         StationInfo stationInfo = findId.orElseThrow(() -> new NotFoundException("적절한 StationInfo가 없습니다."));

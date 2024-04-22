@@ -25,7 +25,6 @@ public class StationApiService {
     public List<StationStatus> saveStationStatus() {
         // api 호출 - StationStatus
         List<StationStatusDto> stationStatusDtos = stationStatusApi.callStationStatusApi();
-
         // 데이터 저장
         return stationStatusRepository.saveAll(stationStatusDtos);
     }
@@ -34,10 +33,16 @@ public class StationApiService {
     public int saveStationInfo() {
         // api 호출 - StationInfo
         List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
-
         // 전체 저장 실행
         List<StationInfo> stationInfos = stationInfoRepository.saveAll(stationInfoDtos);
-
         return stationInfos.size();
     }
+
+//    // 충전소 정보 갱신을 위한 update 메서드
+//    public int updateStationInfo() {
+//        // api 호출 - StationInfo
+//        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
+//
+//    }
+
 }

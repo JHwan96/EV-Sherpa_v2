@@ -41,7 +41,4 @@ public class StationInfoDto {
     private String deleteYn;       // 삭제 여부
     private String deleteDetail;       // 삭제 사유
     private String trafficYn;       // 편의제공 여부
-
-
-
 }

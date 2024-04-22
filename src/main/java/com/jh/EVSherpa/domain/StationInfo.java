@@ -1,6 +1,7 @@
 package com.jh.EVSherpa.domain;
 
 import com.jh.EVSherpa.dto.StationInfoDto;
+import com.jh.EVSherpa.dto.StationInfoUpdateDto;
 import com.jh.EVSherpa.dto.enums.ChargerMethod;
 import com.jh.EVSherpa.dto.enums.ChargerType;
 import jakarta.persistence.Column;
@@ -63,6 +64,18 @@ public class StationInfo {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_status_id")
     private StationStatus stationStatus;
+
+    public void updateStationInfo(StationInfoUpdateDto request){
+        this.chargerType = request.getChargerType();
+        this.useTime = request.getUseTime();
+        this.operatorName = request.getOperatorName();
+        this.operatorCall = request.getOperatorCall();
+        this.output = request.getOutput();
+        this.parkingFree = request.getParkingFree();
+        this.notation = request.getNotation();
+        this.limitYn = request.getLimitYn();
+        this.limitDetail = request.getLimitDetail();
+    }
 
     public static StationInfo fromDto(StationInfoDto dto, StationStatus stationStatus) {
         return StationInfo.builder()
