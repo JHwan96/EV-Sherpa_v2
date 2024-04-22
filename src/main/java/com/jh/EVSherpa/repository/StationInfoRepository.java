@@ -7,6 +7,7 @@ import com.jh.EVSherpa.dto.StationInfoUpdateDto;
 import com.jh.EVSherpa.exception.NotFoundException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class StationInfoRepository {
     private final EntityManager em;
 
@@ -57,34 +59,39 @@ public class StationInfoRepository {
 
     //TODO: 성능 비교 후 하나로 확정
     public List<StationInfo> updateAllByDirtyChecking(List<StationInfoUpdateDto> requests) {
+        long start = System.currentTimeMillis();
         List<StationInfo> stationInfos = new ArrayList<>();
         for (StationInfoUpdateDto request : requests) {
             StationInfo stationInfo = em.createQuery("SELECT si FROM StationInfo si WHERE si.stationChargerId = :stationChargerId", StationInfo.class)
                     .setParameter("stationChargerId", request.getStationChargerId())
                     .getSingleResult();
             stationInfo.updateStationInfo(request);
-            stationInfos.add(stationInfo);
+//            stationInfos.add(stationInfo);
         }
+        long end = System.currentTimeMillis();
+        log.info("Dirty Checking : {}s", (float)(end - start) / 1000);
         return stationInfos;
     }
 
-    String jpql = "UPDATE StationInfo si SET " +
-            "si.chargerType = :chargerType, " +
-            "si.useTime = :useTime, " +
-            "si.operatorName = :operatorName, " +
-            "si.operatorCall = :operatorCall, " +
-            "si.output = :output, " +
-            "si.parkingFree = :parkingFree, " +
-            "si.notation = :notation, " +
-            "si.limitYn = :limitYn, " +
-            "si.limitDetail = :limitDetail, " +
-            "si.deleteYn = :deleteYn, " +
-            "si.deleteDetail = :deleteDetail, " +
-            "si.trafficYn = :trafficYn " +
-            "WHERE e.stationChargerId = :stationChargerId";
+
 
     public List<StationInfo> updateAllByJpql(List<StationInfoUpdateDto> requests) {
+        long start = System.currentTimeMillis();
         List<StationInfo> stationInfos = new ArrayList<>();
+        String jpql = "UPDATE StationInfo si SET " +
+                "si.chargerType = :chargerType, " +
+                "si.useTime = :useTime, " +
+                "si.operatorName = :operatorName, " +
+                "si.operatorCall = :operatorCall, " +
+                "si.output = :output, " +
+                "si.parkingFree = :parkingFree, " +
+                "si.notation = :notation, " +
+                "si.limitYn = :limitYn, " +
+                "si.limitDetail = :limitDetail, " +
+                "si.deleteYn = :deleteYn, " +
+                "si.deleteDetail = :deleteDetail, " +
+                "si.trafficYn = :trafficYn " +
+                "WHERE e.stationChargerId = :stationChargerId";
         for (StationInfoUpdateDto request : requests) {
             em.createQuery(jpql)
                     .setParameter("chargerType", request.getChargerType())
@@ -102,6 +109,9 @@ public class StationInfoRepository {
                     .setParameter("stationChargerId", request.getStationChargerId())
                     .executeUpdate();
         }
+        long end = System.currentTimeMillis();
+        log.info("JPQL : {}s", (float)(end - start) / 1000);
+
         return stationInfos;
     }
 

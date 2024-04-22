@@ -4,6 +4,7 @@ import com.jh.EVSherpa.dto.StationInfoDto;
 import com.jh.EVSherpa.dto.StationInfoUpdateDto;
 import com.jh.EVSherpa.dto.enums.ChargerMethod;
 import com.jh.EVSherpa.dto.enums.ChargerType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -61,7 +62,7 @@ public class StationInfo {
     private String deleteDetail;       // 삭제 사유
     private String trafficYn;       // 편의제공 여부
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "station_status_id")
     private StationStatus stationStatus;
 

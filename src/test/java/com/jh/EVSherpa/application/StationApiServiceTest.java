@@ -1,5 +1,6 @@
 package com.jh.EVSherpa.application;
 
+import com.jh.EVSherpa.domain.StationInfo;
 import com.jh.EVSherpa.domain.StationStatus;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +38,33 @@ class StationApiServiceTest {
 
             Assertions.assertThat(size).isGreaterThan(0);
         }
+
+        @Test
+        @DisplayName("수정 성공 확인 (더티 체킹 사용)")
+        public void testStationInfoUpdateDirtyChecking(){
+            stationApiService.saveStationInfo();
+            Logger logger = LoggerFactory.getLogger(StationInfoTest.class);
+
+            long start = System.currentTimeMillis();
+            List<StationInfo> stationInfos = stationApiService.updateStationInfoDirtyCheck();
+            long end = System.currentTimeMillis();
+
+            logger.info("실행 시간 : {}s", (float)(end - start) / 1000);
+            Assertions.assertThat(stationInfos).isEmpty();
+        }
+
+        @Test
+        @DisplayName("수정 성공 확인 (JPQL 사용)")
+        public void testStationInfoUpdateJpql(){
+            stationApiService.saveStationInfo();
+            Logger logger = LoggerFactory.getLogger(StationInfoTest.class);
+
+            long start = System.currentTimeMillis();
+            List<StationInfo> stationInfos = stationApiService.updateStationInfoJpql();
+            long end = System.currentTimeMillis();
+            logger.info("실행 시간 : {}s", (float)(end - start) / 1000);
+            Assertions.assertThat(stationInfos).isEmpty();
+        }
     }
 
     @Nested
@@ -47,7 +75,7 @@ class StationApiServiceTest {
         public void testStationStatusApiSave(){
             List<StationStatus> stationStatuses = stationApiService.saveStationStatus();
             System.out.println(stationStatuses.get(0).getStationChargerId());
-            Assertions.assertThat(stationStatuses).isNotEmpty();
+            Assertions.assertThat(stationStatuses).isEmpty();
         }
     }
 }

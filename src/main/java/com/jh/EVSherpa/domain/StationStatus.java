@@ -50,6 +50,7 @@ public class StationStatus {
     public static StationStatus fromInfoDto(StationInfoDto dto){
         return StationStatus.builder()
                 .status(dto.getStatus())
+                .stationChargerId(dto.getStationChargerId())
                 .stationUpdateDate(dto.getStationUpdateDate())
                 .lastChargeStart(dto.getLastChargeStart())
                 .lastChargeEnd(dto.getLastChargeEnd())
