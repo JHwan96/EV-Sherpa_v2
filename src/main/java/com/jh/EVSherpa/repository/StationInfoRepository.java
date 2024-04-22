@@ -68,7 +68,42 @@ public class StationInfoRepository {
         return stationInfos;
     }
 
+    String jpql = "UPDATE StationInfo si SET " +
+            "si.chargerType = :chargerType, " +
+            "si.useTime = :useTime, " +
+            "si.operatorName = :operatorName, " +
+            "si.operatorCall = :operatorCall, " +
+            "si.output = :output, " +
+            "si.parkingFree = :parkingFree, " +
+            "si.notation = :notation, " +
+            "si.limitYn = :limitYn, " +
+            "si.limitDetail = :limitDetail, " +
+            "si.deleteYn = :deleteYn, " +
+            "si.deleteDetail = :deleteDetail, " +
+            "si.trafficYn = :trafficYn " +
+            "WHERE e.stationChargerId = :stationChargerId";
 
+    public List<StationInfo> updateAllByJpql(List<StationInfoUpdateDto> requests) {
+        List<StationInfo> stationInfos = new ArrayList<>();
+        for (StationInfoUpdateDto request : requests) {
+            em.createQuery(jpql)
+                    .setParameter("chargerType", request.getChargerType())
+                    .setParameter("useTime", request.getUseTime())
+                    .setParameter("operatorName", request.getOperatorName())
+                    .setParameter("operatorCall", request.getOperatorCall())
+                    .setParameter("output", request.getOutput())
+                    .setParameter("parkingFree", request.getParkingFree())
+                    .setParameter("notation", request.getNotation())
+                    .setParameter("limitYn", request.getLimitYn())
+                    .setParameter("limitDetail", request.getLimitDetail())
+                    .setParameter("deleteYn", request.getDeleteYn())
+                    .setParameter("deleteDetail", request.getDeleteDetail())
+                    .setParameter("trafficYn", request.getTrafficYn())
+                    .setParameter("stationChargerId", request.getStationChargerId())
+                    .executeUpdate();
+        }
+        return stationInfos;
+    }
 
 
     //삭제 메서드
