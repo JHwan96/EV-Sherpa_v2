@@ -30,12 +30,14 @@ public class StationInfoRepository {
     //전체 저장 메서드
     public List<StationInfo> saveAll(List<StationInfoDto> requests) {
         List<StationInfo> stationInfos = new ArrayList<>();
-        for (StationInfoDto request : requests) {
-            StationStatus stationStatus = StationStatus.fromInfoDto(request);
-            StationInfo stationInfo = StationInfo.fromDto(request, stationStatus);
+        for (int i = 0; i < requests.size(); i++) {
+//            StationStatus stationStatus = StationStatus.fromInfoDto(requests.get(i));
+            StationInfo stationInfo = StationInfo.fromDto(requests.get(i), null/*stationStatus*/);
             em.persist(stationInfo);
             stationInfos.add(stationInfo);
         }
+        em.flush();
+        em.clear();
         return stationInfos;
     }
 

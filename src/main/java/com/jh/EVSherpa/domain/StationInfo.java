@@ -15,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,11 +28,16 @@ import org.locationtech.jts.geom.Point;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-
+@SequenceGenerator(
+        name="INFO_SEQ_GENERATOR",
+        sequenceName = "INFO_SEQ",
+        initialValue = 1, allocationSize=100
+)
 public class StationInfo {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "charger_info_id")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="INFO_SEQ_GENERATOR")
+    @Column(name = "station_info_id")
     private Long id;
 
     private String stationName;
@@ -61,10 +67,14 @@ public class StationInfo {
     private String deleteYn;       // 삭제 여부
     private String deleteDetail;       // 삭제 사유
     private String trafficYn;       // 편의제공 여부
-
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "station_status_id")
     private StationStatus stationStatus;
+
+
+    public void updateStationStatus(StationStatus stationStatus){
+        this.stationStatus = stationStatus;
+    }
 
     public void updateStationInfo(StationInfoUpdateDto request){
         this.chargerType = request.getChargerType();
