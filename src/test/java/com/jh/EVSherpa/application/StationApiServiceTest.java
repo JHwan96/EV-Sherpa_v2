@@ -42,12 +42,8 @@ class StationApiServiceTest {
         @Test
         @DisplayName("수정 성공 확인 (더티 체킹 사용)")
         public void testStationInfoUpdateDirtyChecking(){
-            Logger logger = LoggerFactory.getLogger(StationInfoTest.class);
-            long start = System.currentTimeMillis();
             // 충전소 정보 저장 메서드 호출
             stationApiService.saveStationInfo();
-            long end = System.currentTimeMillis();
-            logger.info("saveStationInfo : {}s", (float)(end-start)/1000);
             // 충전소 정보 갱신 메서드 호출
             List<StationInfo> stationInfos = stationApiService.updateStationInfoDirtyCheck();
             Assertions.assertThat(stationInfos).isEmpty();
@@ -56,13 +52,9 @@ class StationApiServiceTest {
         @Test
         @DisplayName("수정 성공 확인 (JPQL 사용)")
         public void testStationInfoUpdateJpql(){
-            Logger logger = LoggerFactory.getLogger(StationInfoTest.class);
-            long start = System.currentTimeMillis();
             // 충전소 정보 저장 메서드 호출
             stationApiService.saveStationInfo();
-            long end = System.currentTimeMillis();
-            logger.info("saveStationInfo : {}s", (float)(end-start)/1000);
-
+            // 충전소 정보 갱신 메서드 호출
             List<StationInfo> stationInfos = stationApiService.updateStationInfoJpql();
             Assertions.assertThat(stationInfos).isEmpty();
         }
