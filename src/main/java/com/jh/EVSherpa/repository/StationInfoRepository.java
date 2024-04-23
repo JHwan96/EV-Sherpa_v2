@@ -91,7 +91,7 @@ public class StationInfoRepository {
                 "si.deleteYn = :deleteYn, " +
                 "si.deleteDetail = :deleteDetail, " +
                 "si.trafficYn = :trafficYn " +
-                "WHERE e.stationChargerId = :stationChargerId";
+                "WHERE si.stationChargerId = :stationChargerId";
         for (StationInfoUpdateDto request : requests) {
             em.createQuery(jpql)
                     .setParameter("chargerType", request.getChargerType())

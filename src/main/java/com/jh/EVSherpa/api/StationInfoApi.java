@@ -41,7 +41,7 @@ public class StationInfoApi {
         String url = /*URL*/ "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
                 + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=" + keyInfo.getServerKey() /*Service Key*/
                 + "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("7", StandardCharsets.UTF_8) /*페이지번호*/
-                + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("10", StandardCharsets.UTF_8);  /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+                + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("4000", StandardCharsets.UTF_8);  /*한 페이지 결과 수 (최소 10, 최대 9999)*/
 //               + "&" + URLEncoder.encode("zcode", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("11", StandardCharsets.UTF_8); /*시도 코드 (행정구역코드 앞 2자리)*/
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -72,7 +72,7 @@ public class StationInfoApi {
         String url = /*URL*/ "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
                 + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=" + keyInfo.getServerKey() /*Service Key*/
                 + "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("7", StandardCharsets.UTF_8) /*페이지번호*/
-                + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("1000", StandardCharsets.UTF_8);  /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+                + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("4000", StandardCharsets.UTF_8);  /*한 페이지 결과 수 (최소 10, 최대 9999)*/
 //               + "&" + URLEncoder.encode("zcode", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("11", StandardCharsets.UTF_8); /*시도 코드 (행정구역코드 앞 2자리)*/
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
