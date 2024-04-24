@@ -31,8 +31,8 @@ public class StationInfoRepository {
     public List<StationInfo> saveAll(List<StationInfoDto> requests) {
         List<StationInfo> stationInfos = new ArrayList<>();
         for (int i = 0; i < requests.size(); i++) {
-//            StationStatus stationStatus = StationStatus.fromInfoDto(requests.get(i));
-            StationInfo stationInfo = StationInfo.fromDto(requests.get(i), null/*stationStatus*/);
+            StationStatus stationStatus = StationStatus.fromInfoDto(requests.get(i));
+            StationInfo stationInfo = StationInfo.fromDto(requests.get(i), stationStatus);
             em.persist(stationInfo);
             stationInfos.add(stationInfo);
         }
@@ -71,10 +71,9 @@ public class StationInfoRepository {
 //            stationInfos.add(stationInfo);
         }
         long end = System.currentTimeMillis();
-        log.info("Dirty Checking : {}s", (float)(end - start) / 1000);
+        log.info("Dirty Checking : {}s", (float) (end - start) / 1000);
         return stationInfos;
     }
-
 
 
     public List<StationInfo> updateAllByJpql(List<StationInfoUpdateDto> requests) {
@@ -112,7 +111,7 @@ public class StationInfoRepository {
                     .executeUpdate();
         }
         long end = System.currentTimeMillis();
-        log.info("JPQL : {}s", (float)(end - start) / 1000);
+        log.info("JPQL : {}s", (float) (end - start) / 1000);
 
         return stationInfos;
     }

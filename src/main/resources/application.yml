@@ -7,25 +7,19 @@ spring:
       - secret
 
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ev_sherpa?rewriteBatchedStatements=true #serverTimezone=Asia/Seoul&
+    username: root
+    password: 1234
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
         show_sql: true
         jdbc:
-          batch_size: 10
+          batch_size: 5
           order_inserts: true
           order_updates: true
 

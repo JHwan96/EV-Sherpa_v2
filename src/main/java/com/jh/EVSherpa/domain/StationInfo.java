@@ -41,7 +41,7 @@ public class StationInfo {
     private Long id;
 
     private String stationName;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String stationChargerId;
     @Enumerated(value = EnumType.STRING)
     private ChargerType chargerType;
