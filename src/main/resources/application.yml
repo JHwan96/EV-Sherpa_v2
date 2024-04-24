@@ -18,10 +18,11 @@ spring:
     properties:
       hibernate:
         show_sql: true
+        order_inserts: true
+        order_updates: true
         jdbc:
           batch_size: 5
-          order_inserts: true
-          order_updates: true
+
 
 #  h2.console.enabled=true
 #  config.additional-location=classpath:application-secret.yml

@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,9 +22,14 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Builder
+@SequenceGenerator(
+        name="STATUS_SEQ_GENERATOR",
+        sequenceName = "STATUS_SEQ",
+        allocationSize=100
+)
 public class StationStatus {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "STATUS_SEQ_GENERATOR")
     private Long id;
 
     @Column(nullable = false)
