@@ -4,6 +4,8 @@ import com.jh.EVSherpa.dto.enums.ChargerType;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class StationInfoUpdateDto {
@@ -14,6 +16,7 @@ public class StationInfoUpdateDto {
     private String operatorName;    // 운영기관명
     private String operatorCall;    // 운영기관 연락처
     private Integer output;         // 충전 용량
+    private LocalDateTime stationUpdateDate;
     private String parkingFree;  // 주차료무료
     private String notation;        // 충전소 안내
     private String limitYn;     // 이용자 제한

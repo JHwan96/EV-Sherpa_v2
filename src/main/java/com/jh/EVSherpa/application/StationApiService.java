@@ -62,4 +62,11 @@ public class StationApiService {
         return stationInfoRepository.updateAllByDirtyChecking(stationInfoUpdateDtos);
     }
 
+    public List<StationInfo> updateStationInfoCheck() {
+        // api 호출 - StationInfo
+        List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdate();
+        // stationInfo 정보 갱신
+        return stationInfoRepository.updateAllByJpqlCheck(stationInfoUpdateDtos);
+    }
+
 }
