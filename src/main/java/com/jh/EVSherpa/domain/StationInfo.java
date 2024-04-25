@@ -50,7 +50,7 @@ public class StationInfo {
     private Point point;
     private String useTime;
     private String businessId;
-    private String businessName;           // 기관명
+    private String businessName;    // 기관명
     private String operatorName;    // 운영기관명
     private String operatorCall;    // 운영기관 연락처
     private Integer output;         // 충전 용량

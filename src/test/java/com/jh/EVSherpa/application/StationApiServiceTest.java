@@ -1,6 +1,5 @@
 package com.jh.EVSherpa.application;
 
-import com.jh.EVSherpa.domain.StationInfo;
 import com.jh.EVSherpa.domain.StationStatus;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -34,29 +33,19 @@ class StationApiServiceTest {
             long end = System.currentTimeMillis();
 
             System.out.println("count : " + size);
-            logger.info("실행 시간 : {}s", (float)(end - start) / 1000);
+            logger.info("실행 시간 : {}s", (float) (end - start) / 1000);
 
             Assertions.assertThat(size).isGreaterThan(0);
         }
 
         @Test
-        @DisplayName("수정 성공 확인 (더티 체킹 사용)")
-        public void testStationInfoUpdateDirtyChecking(){
-            // 충전소 정보 저장 메서드 호출
-            stationApiService.saveStationInfo();
-            // 충전소 정보 갱신 메서드 호출
-            List<StationInfo> stationInfos = stationApiService.updateStationInfoDirtyCheck();
-            Assertions.assertThat(stationInfos).isEmpty();
-        }
-
-        @Test
         @DisplayName("수정 성공 확인 (JPQL 사용)")
-        public void testStationInfoUpdateJpql(){
+        public void testStationInfoUpdateJpql() {
             // 충전소 정보 저장 메서드 호출
             stationApiService.saveStationInfo();
             // 충전소 정보 갱신 메서드 호출
-            List<StationInfo> stationInfos = stationApiService.updateStationInfoJpql();
-            Assertions.assertThat(stationInfos).isEmpty();
+            int stationInfos = stationApiService.updateStationInfo();
+            Assertions.assertThat(stationInfos).isNotEqualTo(0);
         }
     }
 
@@ -65,7 +54,7 @@ class StationApiServiceTest {
     class StationStatusTest {
         @Test
         @DisplayName("저장 성공 확인")
-        public void testStationStatusApiSave(){
+        public void testStationStatusApiSave() {
             List<StationStatus> stationStatuses = stationApiService.saveStationStatus();
             System.out.println(stationStatuses.get(0).getStationChargerId());
             Assertions.assertThat(stationStatuses).isEmpty();

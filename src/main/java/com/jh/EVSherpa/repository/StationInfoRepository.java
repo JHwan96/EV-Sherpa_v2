@@ -4,7 +4,6 @@ import com.jh.EVSherpa.domain.StationInfo;
 import com.jh.EVSherpa.domain.StationStatus;
 import com.jh.EVSherpa.dto.StationInfoDto;
 import com.jh.EVSherpa.dto.StationInfoUpdateDto;
-import com.jh.EVSherpa.dto.enums.ChargerType;
 import com.jh.EVSherpa.exception.NotFoundException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -60,26 +59,8 @@ public class StationInfoRepository {
                 .getResultList();
     }
 
-    //TODO: 성능 비교 후 하나로 확정
-    public List<StationInfo> updateAllByDirtyChecking(List<StationInfoUpdateDto> requests) {
-        long start = System.currentTimeMillis();
-        List<StationInfo> stationInfos = new ArrayList<>();
-        for (StationInfoUpdateDto request : requests) {
-            StationInfo stationInfo = em.createQuery("SELECT si FROM StationInfo si WHERE si.stationChargerId = :stationChargerId", StationInfo.class)
-                    .setParameter("stationChargerId", request.getStationChargerId())
-                    .getSingleResult();
-            stationInfo.updateStationInfo(request);
-        }
-        long end = System.currentTimeMillis();
-        log.info("Dirty Checking : {}s", (float) (end - start) / 1000);
-        return stationInfos;
-    }
-
-
-    public List<StationInfo> updateAllByJpql(List<StationInfoUpdateDto> requests) {
-        long start = System.currentTimeMillis();
+    public int updateAll(List<StationInfoUpdateDto> requests) {
         int count = 0;
-        List<StationInfo> stationInfos = new ArrayList<>();
         String jpql = "UPDATE StationInfo si SET " +
                 "si.chargerType = :chargerType, " +
                 "si.useTime = :useTime, " +
@@ -110,56 +91,11 @@ public class StationInfoRepository {
                     .setParameter("trafficYn", request.getTrafficYn())
                     .setParameter("stationChargerId", request.getStationChargerId())
                     .executeUpdate();
-            count+=i;
+            count += i;
         }
-        long end = System.currentTimeMillis();
-        log.info("JPQL : {}s", (float) (end - start) / 1000);
         log.info("update count : {}", count);
-        return stationInfos;
+        return count;
     }
-
-    public List<StationInfo> updateAllByJpqlCheck(List<StationInfoUpdateDto> requests) {
-        long start = System.currentTimeMillis();
-        int count = 0;
-        List<StationInfo> stationInfos = new ArrayList<>();
-        String jpql = "UPDATE StationInfo si SET " +
-                "si.chargerType = :chargerType, " +
-                "si.useTime = :useTime, " +
-                "si.operatorName = :operatorName, " +
-                "si.operatorCall = :operatorCall, " +
-                "si.output = :output, " +
-                "si.parkingFree = :parkingFree, " +
-                "si.notation = :notation, " +
-                "si.limitYn = :limitYn, " +
-                "si.limitDetail = :limitDetail, " +
-                "si.deleteYn = :deleteYn, " +
-                "si.deleteDetail = :deleteDetail, " +
-                "si.trafficYn = :trafficYn " +
-                "WHERE si.stationChargerId = :stationChargerId";
-        for (StationInfoUpdateDto request : requests) {
-            int i = em.createQuery(jpql)
-                    .setParameter("chargerType", ChargerType.AC_NORMAL)
-                    .setParameter("useTime", "a")
-                    .setParameter("operatorName", "a")
-                    .setParameter("operatorCall", "a")
-                    .setParameter("output", 100)
-                    .setParameter("parkingFree", "a")
-                    .setParameter("notation", "a")
-                    .setParameter("limitYn", "a")
-                    .setParameter("limitDetail", "a")
-                    .setParameter("deleteYn", "a")
-                    .setParameter("deleteDetail", "a")
-                    .setParameter("trafficYn", "a")
-                    .setParameter("stationChargerId", "request.getStationChargerId()")
-                    .executeUpdate();
-            count+=i;
-        }
-        long end = System.currentTimeMillis();
-        log.info("JPQL : {}s", (float) (end - start) / 1000);
-        log.info("update count : {}", count);
-        return stationInfos;
-    }
-
 
     //삭제 메서드
     public StationInfo deleteById(Long id) {

@@ -48,25 +48,10 @@ public class StationApiService {
     }
 
     // 충전소 정보 갱신을 위한 update 메서드
-    public List<StationInfo> updateStationInfoJpql() {
+    public int updateStationInfo() {
         // api 호출 - StationInfo
         List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdate();
         // stationInfo 정보 갱신
-        return stationInfoRepository.updateAllByJpql(stationInfoUpdateDtos);
+        return stationInfoRepository.updateAll(stationInfoUpdateDtos);
     }
-
-    public List<StationInfo> updateStationInfoDirtyCheck() {
-        // api 호출 - StationInfo
-        List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdate();
-        // stationInfo 정보 갱신
-        return stationInfoRepository.updateAllByDirtyChecking(stationInfoUpdateDtos);
-    }
-
-    public List<StationInfo> updateStationInfoCheck() {
-        // api 호출 - StationInfo
-        List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdate();
-        // stationInfo 정보 갱신
-        return stationInfoRepository.updateAllByJpqlCheck(stationInfoUpdateDtos);
-    }
-
 }
