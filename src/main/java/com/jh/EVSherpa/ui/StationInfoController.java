@@ -1,6 +1,6 @@
 package com.jh.EVSherpa.ui;
 
-import com.jh.EVSherpa.application.StationApiService;
+import com.jh.EVSherpa.application.StationInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/station/info")
 public class StationInfoController {
-    private final StationApiService stationApiService;
+    private final StationInfoService stationApiService;
 
     // save api 강제 호출
     @PostMapping("/save")

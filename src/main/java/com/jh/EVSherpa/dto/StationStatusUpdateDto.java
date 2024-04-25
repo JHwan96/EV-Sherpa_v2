@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class StationStatusUpdateDto {
+    private String stationChargerId;
     private ChargerStatus status;
     private LocalDateTime stationUpdateDate;
     private LocalDateTime lastChargeStart;

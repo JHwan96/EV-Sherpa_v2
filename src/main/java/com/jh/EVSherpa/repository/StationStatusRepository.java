@@ -6,6 +6,7 @@ import com.jh.EVSherpa.dto.StationStatusUpdateDto;
 import com.jh.EVSherpa.exception.NotFoundException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class StationStatusRepository {
     private final EntityManager em;
 
@@ -21,7 +23,7 @@ public class StationStatusRepository {
         return em.find(StationStatus.class, id);
     }
 
-    //전체 저장 메서드
+    //전체 저장 메서드 (테스트용)
     public List<StationStatus> saveAll(List<StationStatusDto> requests){
         List<StationStatus> statuses = new ArrayList<>();       // TODO: 나중에 필요없을지 확인
         for(StationStatusDto request : requests) {
@@ -29,6 +31,9 @@ public class StationStatusRepository {
             em.persist(stationStatus);
             statuses.add(stationStatus);
         }
+        em.flush();
+        em.clear();
+
         return statuses;
     }
 

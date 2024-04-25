@@ -28,10 +28,7 @@ public class StationStatusApi {
     @Autowired
     KeyInfo keyInfo;
 
-    /**
-     * 충전소 상태 정보 반환 API
-     * @return List<ChargerStatusDto>
-     */
+    //충전소 상태 정보 반환 API
     public List<StationStatusDto> callStationStatusApi() {
         List<StationStatusDto> apiDto = new ArrayList<>();
 

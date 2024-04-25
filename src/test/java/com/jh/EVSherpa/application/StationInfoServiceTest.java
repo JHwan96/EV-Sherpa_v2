@@ -1,6 +1,5 @@
 package com.jh.EVSherpa.application;
 
-import com.jh.EVSherpa.domain.StationStatus;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,14 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 
 @SpringBootTest
 @Transactional
-class StationApiServiceTest {
+class StationInfoServiceTest {
     @Autowired
-    StationApiService stationApiService;
+    StationInfoService stationInfoService;
 
     @Nested
     @DisplayName("StationInfoApi를 호출할 때")
@@ -29,7 +26,7 @@ class StationApiServiceTest {
             Logger logger = LoggerFactory.getLogger(StationInfoTest.class);
 
             long start = System.currentTimeMillis();
-            int size = stationApiService.saveStationInfo();
+            int size = stationInfoService.saveStationInfo();
             long end = System.currentTimeMillis();
 
             System.out.println("count : " + size);
@@ -42,22 +39,12 @@ class StationApiServiceTest {
         @DisplayName("수정 성공 확인 (JPQL 사용)")
         public void testStationInfoUpdateJpql() {
             // 충전소 정보 저장 메서드 호출
-            stationApiService.saveStationInfo();
+            stationInfoService.saveStationInfo();
             // 충전소 정보 갱신 메서드 호출
-            int stationInfos = stationApiService.updateStationInfo();
+            int stationInfos = stationInfoService.updateStationInfo();
             Assertions.assertThat(stationInfos).isNotEqualTo(0);
         }
     }
 
-    @Nested
-    @DisplayName("StationStatusApi를 호출할 때")
-    class StationStatusTest {
-        @Test
-        @DisplayName("저장 성공 확인")
-        public void testStationStatusApiSave() {
-            List<StationStatus> stationStatuses = stationApiService.saveStationStatus();
-            System.out.println(stationStatuses.get(0).getStationChargerId());
-            Assertions.assertThat(stationStatuses).isEmpty();
-        }
-    }
+
 }
