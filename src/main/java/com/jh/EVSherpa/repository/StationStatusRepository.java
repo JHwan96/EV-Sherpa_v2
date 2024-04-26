@@ -37,8 +37,6 @@ public class StationStatusRepository {
         return statuses;
     }
 
-
-
     public Optional<StationStatus> findById(Long id) {
         return Optional.ofNullable(em.find(StationStatus.class, id));
     }
@@ -53,5 +51,29 @@ public class StationStatusRepository {
                 .orElseThrow(() -> new NotFoundException("충전소 상태정보가 없습니다."));
         stationStatus.updateStatus(request);
         return stationStatus;
+    }
+
+    public int updateAll(List<StationStatusUpdateDto> requests) {
+        int count = 0;
+        String jpql = "UPDATE StationStatus ss SET " +
+                "ss.status = :status, " +
+                "ss.stationUpdateDate = :stationUpdateDate, " +
+                "ss.lastChargeStart = :lastChargeStart, " +
+                "ss.lastChargeEnd = :lastChargeEnd, " +
+                "ss.nowChargeStart = :lastChargeStart " +
+                "WHERE ss.stationChargerId = :stationChargerId";
+        for(StationStatusUpdateDto request : requests) {
+            int i = em.createQuery(jpql)
+                    .setParameter("status", request.getStatus())
+                    .setParameter("stationUpdateDate", request.getStationUpdateDate())
+                    .setParameter("lastChargeStart", request.getLastChargeStart())
+                    .setParameter("lastChargeEnd", request.getLastChargeEnd())
+                    .setParameter("nowChargerStart", request.getNowChargeStart())
+                    .setParameter("stationChargerId", request.getStationChargerId())
+                    .executeUpdate();
+            count+=i;
+        }
+        log.info("update count : {}", count);
+        return count;
     }
 }
