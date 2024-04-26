@@ -24,9 +24,9 @@ public class StationStatusRepository {
     }
 
     //전체 저장 메서드 (테스트용)
-    public List<StationStatus> saveAll(List<StationStatusDto> requests){
+    public List<StationStatus> saveAll(List<StationStatusDto> requests) {
         List<StationStatus> statuses = new ArrayList<>();       // TODO: 나중에 필요없을지 확인
-        for(StationStatusDto request : requests) {
+        for (StationStatusDto request : requests) {
             StationStatus stationStatus = StationStatus.fromStatusDto(request);
             em.persist(stationStatus);
             statuses.add(stationStatus);
@@ -62,7 +62,7 @@ public class StationStatusRepository {
                 "ss.lastChargeEnd = :lastChargeEnd, " +
                 "ss.nowChargeStart = :lastChargeStart " +
                 "WHERE ss.stationChargerId = :stationChargerId";
-        for(StationStatusUpdateDto request : requests) {
+        for (StationStatusUpdateDto request : requests) {
             int i = em.createQuery(jpql)
                     .setParameter("status", request.getStatus())
                     .setParameter("stationUpdateDate", request.getStationUpdateDate())
@@ -71,7 +71,7 @@ public class StationStatusRepository {
                     .setParameter("nowChargerStart", request.getNowChargeStart())
                     .setParameter("stationChargerId", request.getStationChargerId())
                     .executeUpdate();
-            count+=i;
+            count += i;
         }
         log.info("update count : {}", count);
         return count;

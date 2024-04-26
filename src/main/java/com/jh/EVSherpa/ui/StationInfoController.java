@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,19 +14,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/station/info")
 public class StationInfoController {
-    private final StationInfoService stationApiService;
+    private final StationInfoService stationInfoService;
 
     // save api 강제 호출
     @PostMapping("/save")
     public ResponseEntity<Integer> saveStationInfoFromApi() {
-        int stationInfoSize = stationApiService.saveStationInfo();
+        int stationInfoSize = stationInfoService.saveStationInfo();
         return ResponseEntity.ok(stationInfoSize);
     }
 
     // update api 강제 호출
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<Integer> updateStationInfo() {
-        int updateCount = stationApiService.updateStationInfo();
+        int updateCount = stationInfoService.updateStationInfo();
         return ResponseEntity.ok(updateCount);
     }
 }
