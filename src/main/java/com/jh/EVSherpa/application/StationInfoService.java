@@ -30,7 +30,7 @@ public class StationInfoService {
         return stationInfos.size();
     }
 
-    // 충전소 정보 갱신을 위한 update 메서드  (사용자 사용 X)
+    // 충전소 정보 update 메서드  (사용자 사용 X)
     public int updateStationInfo() {
         // api 호출 - StationInfo
         List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdate();
@@ -38,6 +38,7 @@ public class StationInfoService {
         return stationInfoRepository.updateAll(stationInfoUpdateDtos);
     }
 
+    // 충전소 정보 전체 update 메서드  (사용자 사용 X)
     public int updateStationAllInfo() {
         List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
         return stationInfoRepository.updateAllInfo(stationInfoDtos);

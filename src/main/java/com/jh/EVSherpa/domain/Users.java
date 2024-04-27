@@ -1,5 +1,6 @@
 package com.jh.EVSherpa.domain;
 
+import com.jh.EVSherpa.dto.UserRequestDto;
 import com.jh.EVSherpa.global.jpa.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,5 +43,12 @@ public class Users extends BaseTimeEntity {
         this.userId = userId;
         this.password = password;
         this.userInfo = userInfo;
+    }
+
+    public static Users of(UserRequestDto requestDto) {
+        return Users.builder()
+                .userId(requestDto.getUserId())
+                .password(requestDto.getPassword())
+                .build();
     }
 }
