@@ -2,7 +2,6 @@ package com.jh.EVSherpa.domain;
 
 import com.jh.EVSherpa.dto.StationInfoDto;
 import com.jh.EVSherpa.dto.StationStatusDto;
-import com.jh.EVSherpa.dto.StationStatusUpdateDto;
 import com.jh.EVSherpa.dto.enums.ChargerStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,9 +27,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SequenceGenerator(
-        name="STATUS_SEQ_GENERATOR",
+        name = "STATUS_SEQ_GENERATOR",
         sequenceName = "STATUS_SEQ",
-        allocationSize=100
+        allocationSize = 100
 )
 public class StationStatus {
     @Id
@@ -50,7 +49,7 @@ public class StationStatus {
     @OneToOne(mappedBy = "stationStatus", fetch = FetchType.LAZY)
     private StationInfo stationInfo;
 
-    public void updateStatus(StationStatusUpdateDto request) {
+    public void updateStatus(StationStatusDto request) {
         this.status = request.getStatus();
         this.stationUpdateDate = request.getStationUpdateDate();
         this.lastChargeStart = request.getLastChargeStart();
@@ -58,7 +57,7 @@ public class StationStatus {
         this.nowChargeStart = request.getNowChargeStart();
     }
 
-    public static StationStatus fromInfoDto(StationInfoDto dto){
+    public static StationStatus fromInfoDto(StationInfoDto dto) {
         return StationStatus.builder()
                 .status(dto.getStatus())
                 .stationChargerId(dto.getStationChargerId())
@@ -69,7 +68,7 @@ public class StationStatus {
                 .build();
     }
 
-    public static StationStatus fromStatusDto(StationStatusDto dto){
+    public static StationStatus fromStatusDto(StationStatusDto dto) {
         return StationStatus.builder()
                 .stationChargerId(dto.getStationChargerId())
                 .status(dto.getStatus())

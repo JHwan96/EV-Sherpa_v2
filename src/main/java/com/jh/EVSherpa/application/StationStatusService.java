@@ -3,7 +3,6 @@ package com.jh.EVSherpa.application;
 import com.jh.EVSherpa.api.StationStatusApi;
 import com.jh.EVSherpa.domain.StationStatus;
 import com.jh.EVSherpa.dto.StationStatusDto;
-import com.jh.EVSherpa.dto.StationStatusUpdateDto;
 import com.jh.EVSherpa.repository.StationStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +30,8 @@ public class StationStatusService {
     //StationStatus update 메서드
     public int updateStationStatus() {
         // api 호출
-        List<StationStatusUpdateDto> stationStatusUpdateDtos = stationStatusApi.callStationStatusApiForUpdate();
+        List<StationStatusDto> stationStatusDtos = stationStatusApi.callStationStatusApi();
         // 데이터 update
-        return stationStatusRepository.updateAll(stationStatusUpdateDtos);
+        return stationStatusRepository.updateAll(stationStatusDtos);
     }
 }

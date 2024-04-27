@@ -2,7 +2,6 @@ package com.jh.EVSherpa.repository;
 
 import com.jh.EVSherpa.domain.StationStatus;
 import com.jh.EVSherpa.dto.StationStatusDto;
-import com.jh.EVSherpa.dto.StationStatusUpdateDto;
 import com.jh.EVSherpa.exception.NotFoundException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -46,14 +45,14 @@ public class StationStatusRepository {
                 .getResultList();
     }
 
-    public StationStatus updateById(StationStatusUpdateDto request, Long id) {
+    public StationStatus updateById(StationStatusDto request, Long id) {
         StationStatus stationStatus = Optional.of(em.find(StationStatus.class, id))
                 .orElseThrow(() -> new NotFoundException("충전소 상태정보가 없습니다."));
         stationStatus.updateStatus(request);
         return stationStatus;
     }
 
-    public int updateAll(List<StationStatusUpdateDto> requests) {
+    public int updateAll(List<StationStatusDto> requests) {
         int count = 0;
         String jpql = "UPDATE StationStatus ss SET " +
                 "ss.status = :status, " +
@@ -62,7 +61,7 @@ public class StationStatusRepository {
                 "ss.lastChargeEnd = :lastChargeEnd, " +
                 "ss.nowChargeStart = :lastChargeStart " +
                 "WHERE ss.stationChargerId = :stationChargerId";
-        for (StationStatusUpdateDto request : requests) {
+        for (StationStatusDto request : requests) {
             int i = em.createQuery(jpql)
                     .setParameter("status", request.getStatus())
                     .setParameter("stationUpdateDate", request.getStationUpdateDate())
