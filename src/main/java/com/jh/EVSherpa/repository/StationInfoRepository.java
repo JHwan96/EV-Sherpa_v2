@@ -97,6 +97,70 @@ public class StationInfoRepository {
         return count;
     }
 
+    // 전체 정보 갱신 메서드 (7~30일 마다 한번씩 갱신)
+    // TODO: 효용성 있는지 차후 확인
+    public int updateAllInfo(List<StationInfoDto> requests) {
+        int count = 0;
+        String jpql = "UPDATE StationInfo si SET " +
+                "si.stationName = :stationName, " +
+                "si.stationChargerId = :stationChargerId, " +
+                "si.chargerType = :chargerType, " +
+                "si.address = :address, " +
+                "si.location = :location, " +
+                "si.point = :point, " +
+                "si.useTime = :useTime, " +
+                "si.businessId = :businessId, " +
+                "si.businessName = :businessName, " +
+                "si.operatorName = :operatorName, " +
+                "si.operatorCall = :operatorCall, " +
+                "si.output = :output, " +
+                "si.chargerMethod = :chargerMethod, " +
+                "si.zcode = :zcode, " +
+                "si.zscode = :zscode, " +
+                "si.kind = :kind, " +
+                "si.kindDetail = :kindDetail, " +
+                "si.parkingFree = :parkingFree, " +
+                "si.notation = :notation, " +
+                "si.limitYn = :limitYn, " +
+                "si.limitDetail = :limitDetail, " +
+                "si.deleteYn = :deleteYn, " +
+                "si.deleteDetail = :deleteDetail, " +
+                "si.trafficYn = :trafficYn " +
+                "WHERE si.stationChargerId = :stationChargerId";
+        for (StationInfoDto request : requests) {
+            int i = em.createQuery(jpql)
+                    .setParameter("stationName", request.getStationName())
+                    .setParameter("stationChargerId", request.getStationChargerId())
+                    .setParameter("chargerType", request.getChargerType())
+                    .setParameter("address", request.getAddress())
+                    .setParameter("location", request.getLocation())
+                    .setParameter("point", request.getPosition())
+                    .setParameter("useTime", request.getUseTime())
+                    .setParameter("businessId", request.getBusinessId())
+                    .setParameter("businessName", request.getBusinessName())
+                    .setParameter("operatorName", request.getOperatorName())
+                    .setParameter("operatorCall", request.getOperatorCall())
+                    .setParameter("output", request.getOutput())
+                    .setParameter("chargerMethod", request.getChargerMethod())
+                    .setParameter("zcode", request.getZcode())
+                    .setParameter("zscode", request.getZscode())
+                    .setParameter("kind", request.getKind())
+                    .setParameter("kindDetail", request.getKindDetail())
+                    .setParameter("parkingFree", request.getParkingFree())
+                    .setParameter("notation", request.getNotation())
+                    .setParameter("limitYn", request.getLimitYn())
+                    .setParameter("limitDetail", request.getLimitDetail())
+                    .setParameter("deleteYn", request.getDeleteYn())
+                    .setParameter("deleteDetail", request.getDeleteDetail())
+                    .setParameter("trafficYn", request.getTrafficYn())
+                    .setParameter("stationChargerId", request.getStationChargerId())
+                    .executeUpdate();
+            count += i;
+        }
+        log.info("update count : {}", count);
+        return count;
+    }
+
     //삭제 메서드
     public StationInfo deleteById(Long id) {
         Optional<StationInfo> findId = findById(id);

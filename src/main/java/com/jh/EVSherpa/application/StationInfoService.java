@@ -20,7 +20,7 @@ public class StationInfoService {
     private final StationInfoApi stationInfoApi;
     private final StationInfoRepository stationInfoRepository;
 
-    // StationInfoApi 호출 및 저장 메서드 (처음 저장할 때만 사용)
+    // StationInfoApi 호출 및 저장 메서드 (사용자 사용 X)
     public int saveStationInfo() {
         // api 호출 - StationInfo
         List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
@@ -30,11 +30,16 @@ public class StationInfoService {
         return stationInfos.size();
     }
 
-    // 충전소 정보 갱신을 위한 update 메서드
+    // 충전소 정보 갱신을 위한 update 메서드  (사용자 사용 X)
     public int updateStationInfo() {
         // api 호출 - StationInfo
         List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdate();
         // stationInfo 정보 갱신
         return stationInfoRepository.updateAll(stationInfoUpdateDtos);
+    }
+
+    public int updateStationAllInfo() {
+        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
+        return stationInfoRepository.updateAllInfo(stationInfoDtos);
     }
 }
