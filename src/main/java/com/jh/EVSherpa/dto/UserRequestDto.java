@@ -16,4 +16,9 @@ public class UserRequestDto {
         this.userId = userId;
         this.password = password;
     }
+
+    public UserRequestDto encodePassword(String encode) {
+        this.password = encode;
+        return this;
+    }
 }

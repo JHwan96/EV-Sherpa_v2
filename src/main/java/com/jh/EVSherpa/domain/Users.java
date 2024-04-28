@@ -26,7 +26,7 @@ public class Users extends BaseTimeEntity {
     @Column(columnDefinition = "BINARY(16)")
     private UUID id;
 
-    @Column(name = "user_id", length = 16, nullable = false)
+    @Column(name = "user_id", length = 16, nullable = false, unique = true)
     private String userId;
 
     @Column(name = "password", length = 64, nullable = false)
