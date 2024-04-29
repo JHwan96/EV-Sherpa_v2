@@ -5,6 +5,7 @@ import com.jh.EVSherpa.dto.StationInfoUpdateDto;
 import com.jh.EVSherpa.dto.enums.ChargerMethod;
 import com.jh.EVSherpa.dto.enums.ChargerStatus;
 import com.jh.EVSherpa.dto.enums.ChargerType;
+import com.jh.EVSherpa.exception.ApiProblemException;
 import com.jh.EVSherpa.global.config.KeyInfo;
 import com.jh.EVSherpa.global.utility.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +62,7 @@ public class StationInfoApi {
                 }
             }
         } catch (IOException | ParserConfigurationException | SAXException e) {
-            e.printStackTrace();
+            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
         }
         return apiDto;
     }

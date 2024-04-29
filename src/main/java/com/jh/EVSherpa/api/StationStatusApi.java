@@ -2,6 +2,7 @@ package com.jh.EVSherpa.api;
 
 import com.jh.EVSherpa.dto.StationStatusDto;
 import com.jh.EVSherpa.dto.enums.ChargerStatus;
+import com.jh.EVSherpa.exception.ApiProblemException;
 import com.jh.EVSherpa.global.config.KeyInfo;
 import com.jh.EVSherpa.global.utility.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -55,8 +56,8 @@ public class StationStatusApi {
                     apiDto.add(check);
                 }
             }
-        } catch (IOException | ParserConfigurationException | SAXException e) { //TODO: 차후 처리
-            e.printStackTrace();
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+           throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
         }
         log.info("apiDto size : {}", apiDto.size());
         return apiDto;
