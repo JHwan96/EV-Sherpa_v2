@@ -37,8 +37,8 @@ public class StationInfoApi {
 
     // StationInfo를 반환하는 API 호출 메소드
 
-    public List<StationInfoDto> callStationInfoApi() {
-        List<StationInfoDto> apiDto = new ArrayList<>();
+    public List<List<StationInfoDto>> callStationInfoApi() {
+        List<List<StationInfoDto>> apiDtoList = new ArrayList<>();
         List<String> urlList = new ArrayList<>();
         int totalCount = getTotalCount();
         int pageCount = (totalCount /9999)+1;
@@ -51,32 +51,33 @@ public class StationInfoApi {
             urlList.add(temp);
         }
 
-        log.info(totalCount+" "+pageCount);
-        String url = urlList.get(0);
-
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
-            ///
-            Document parse = dBuilder.parse(url);
-            parse.getDocumentElement().normalize();
-            NodeList nList = parse.getElementsByTagName("item");
+            for(int i = 0; i < urlList.size(); i++) {
+                String url = urlList.get(i);
+                List<StationInfoDto> tempDto = new ArrayList<>();
 
-            log.info(String.valueOf(nList.getLength()));
+                Document parse = dBuilder.parse(url);
+                parse.getDocumentElement().normalize();
+                NodeList nList = parse.getElementsByTagName("item");
 
-            for (int i = 0; i < nList.getLength(); i++) {
-                Node item = nList.item(i);
-                if (item.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) item;
-                    StationInfoDto dto = buildStationInfoDto(element);
-                    apiDto.add(dto);
+                for (int j = 0; j < nList.getLength(); j++) {
+                    Node item = nList.item(j);
+                    if (item.getNodeType() == Node.ELEMENT_NODE) {
+                        Element element = (Element) item;
+                        StationInfoDto dto = buildStationInfoDto(element);
+                        tempDto.add(dto);
+                    }
                 }
+                apiDtoList.add(tempDto);
             }
+            log.info("Dto transform END");
         } catch (IOException | ParserConfigurationException | SAXException e) {
             throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
         }
-        return apiDto;
+        return apiDtoList;
     }
 
     // 전체 개수 가져오는 메소드

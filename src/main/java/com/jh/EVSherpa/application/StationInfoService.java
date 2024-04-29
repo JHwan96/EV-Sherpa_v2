@@ -23,9 +23,11 @@ public class StationInfoService {
     // StationInfoApi 호출 및 저장 메서드 (사용자 사용 X)
     public int saveStationInfo() {
         // api 호출 - StationInfo
-        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
+        List<List<StationInfoDto>> stationInfoDtos = stationInfoApi.callStationInfoApi();
+        List<StationInfoDto> tempStationInfoDtos = stationInfoDtos.get(0);
+        log.info("count: {}",String.valueOf(stationInfoDtos.size()));
         // 전체 저장 실행
-        List<StationInfo> stationInfos = stationInfoRepository.saveAll(stationInfoDtos);
+        List<StationInfo> stationInfos = stationInfoRepository.saveAll(tempStationInfoDtos);
 
         return stationInfos.size();
     }
@@ -40,7 +42,8 @@ public class StationInfoService {
 
     // 충전소 정보 전체 update 메서드  (사용자 사용 X)
     public int updateStationAllInfo() {
-        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApi();
-        return stationInfoRepository.updateAllInfo(stationInfoDtos);
+        List<List<StationInfoDto>> stationInfoDtos = stationInfoApi.callStationInfoApi();
+        List<StationInfoDto> tempStationInfoDtos = stationInfoDtos.get(0);
+        return stationInfoRepository.updateAllInfo(tempStationInfoDtos);
     }
 }
