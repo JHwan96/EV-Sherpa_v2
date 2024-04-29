@@ -2,6 +2,7 @@ package com.jh.EVSherpa.application;
 
 import com.jh.EVSherpa.domain.Users;
 import com.jh.EVSherpa.dto.UserRequestDto;
+import com.jh.EVSherpa.exception.UserNotFoundException;
 import com.jh.EVSherpa.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,8 +21,23 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public UserRequestDto findUserByUserId(String userId) {
+        Users user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("유저 아이디가 없습니다."));
+        return user.toDto(user);
+    }
+
+    public Boolean login(UserRequestDto requestDto) {
+        Users user = userRepository.findByUserId(requestDto.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("유저 아이디가 없습니다."));
+        return encoder.matches(requestDto.getPassword(), user.getPassword());
+    }
+
     private UserRequestDto encodePassword(UserRequestDto requestDto) {
         String encode = encoder.encode(requestDto.getPassword());
-        return requestDto.encodePassword(encode);
+        return UserRequestDto.builder()
+                .userId(requestDto.getUserId())
+                .password(encode)
+                .build();
     }
 }

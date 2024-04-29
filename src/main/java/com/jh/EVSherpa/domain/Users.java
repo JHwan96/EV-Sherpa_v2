@@ -51,4 +51,10 @@ public class Users extends BaseTimeEntity {
                 .password(requestDto.getPassword())
                 .build();
     }
+    public UserRequestDto toDto(Users user){
+        return UserRequestDto.builder()
+                .userId(user.getUserId())
+                .password(user.getPassword())
+                .build();
+    }
 }
