@@ -35,23 +35,35 @@ public class StationInfoApi {
     @Autowired
     KeyInfo keyInfo;
 
-    // StationInfo를 반환하는 API 호출 메서드
+    // StationInfo를 반환하는 API 호출 메소드
+
     public List<StationInfoDto> callStationInfoApi() {
         List<StationInfoDto> apiDto = new ArrayList<>();
+        List<String> urlList = new ArrayList<>();
+        int totalCount = getTotalCount();
+        int pageCount = (totalCount /9999)+1;
 
-        String url = /*URL*/ "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
-                + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=" + keyInfo.getServerKey() /*Service Key*/
-                + "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("1", StandardCharsets.UTF_8) /*페이지번호*/
-                + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("3000", StandardCharsets.UTF_8);  /*한 페이지 결과 수 (최소 10, 최대 9999)*/
-//               + "&" + URLEncoder.encode("zcode", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("11", StandardCharsets.UTF_8); /*시도 코드 (행정구역코드 앞 2자리)*/
-        log.info(url);
+        for(int i = 1; i <= pageCount; i++) {
+            String temp = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
+                    + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
+                    + "&pageNo="+i // 페이지번호
+                    + "&numOfRows=9999";  // 한 페이지 결과 수 (최소 10, 최대 9999)
+            urlList.add(temp);
+        }
+
+        log.info(totalCount+" "+pageCount);
+        String url = urlList.get(0);
+
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document parse = dBuilder.parse(url);
 
+            ///
+            Document parse = dBuilder.parse(url);
             parse.getDocumentElement().normalize();
             NodeList nList = parse.getElementsByTagName("item");
+
+            log.info(String.valueOf(nList.getLength()));
 
             for (int i = 0; i < nList.getLength(); i++) {
                 Node item = nList.item(i);
@@ -67,7 +79,29 @@ public class StationInfoApi {
         return apiDto;
     }
 
-    // StationInfoUpdate를 반환하는 API 호출 메서드
+    // 전체 개수 가져오는 메소드
+    private int getTotalCount() {
+        String url = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
+                + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
+                + "&pageNo=1" /*페이지번호*/
+                + "&numOfRows=10";  /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+        int totalCount;
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document parse = dBuilder.parse(url);
+
+            Element headerElement = (Element) parse.getElementsByTagName("header").item(0);
+            Element totalCountElement = (Element) headerElement.getElementsByTagName("totalCount").item(0);
+            String total = totalCountElement.getTextContent();
+            totalCount = Integer.parseInt(total);
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+        }
+        return totalCount;
+    }
+
+    // StationInfoUpdate를 반환하는 API 호출 메소드
     public List<StationInfoUpdateDto> callStationInfoApiForUpdate() {
         long start = System.currentTimeMillis();
         List<StationInfoUpdateDto> apiDto = new ArrayList<>();
