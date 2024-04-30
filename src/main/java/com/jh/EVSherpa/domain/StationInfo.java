@@ -47,6 +47,8 @@ public class StationInfo {
     private ChargerType chargerType;
     private String address;
     private String location;
+
+    @Column(name="pointer", columnDefinition = "GEOMETRY")
     private Point pointer;
     private String useTime;
     private String businessId;

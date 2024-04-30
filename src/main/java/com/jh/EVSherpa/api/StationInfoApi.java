@@ -246,7 +246,7 @@ public class StationInfoApi {
         GeometryFactory geometryFactory = new GeometryFactory();
         double lat = Double.parseDouble(latitude);
         double lng = Double.parseDouble(longitude);
-        Point point = geometryFactory.createPoint(new Coordinate(lat, lng));        // 변경 해봐야할 부분
+        Point point = geometryFactory.createPoint(new Coordinate(lng, lat));        // 변경 해봐야할 부분
         int SRID = 4326;
         point.setSRID(SRID);
 

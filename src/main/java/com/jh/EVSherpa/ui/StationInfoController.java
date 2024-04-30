@@ -23,6 +23,12 @@ public class StationInfoController {    // TODO: IP 제한
         return ResponseEntity.ok(stationInfoSize);
     }
 
+    @PostMapping("/save/test")
+    public ResponseEntity<Integer> saveStationInfoFromApiForTest() {
+        int stationInfoSize = stationInfoService.saveStationInfoForTest();
+        return ResponseEntity.ok(stationInfoSize);
+    }
+
     // update api 강제 호출 (사용자 ㅍ X)
     @PutMapping("/update")
     public ResponseEntity<Integer> updateStationInfo() {
