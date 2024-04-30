@@ -41,12 +41,12 @@ public class StationInfoApi {
         List<List<StationInfoDto>> apiDtoList = new ArrayList<>();
         List<String> urlList = new ArrayList<>();
         int totalCount = getTotalCount();
-        int pageCount = (totalCount /9999)+1;
+        int pageCount = (totalCount / 9999) + 1;
 
-        for(int i = 1; i <= pageCount; i++) {
+        for (int i = 1; i <= pageCount; i++) {
             String temp = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
                     + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
-                    + "&pageNo="+i // 페이지번호
+                    + "&pageNo=" + i // 페이지번호
                     + "&numOfRows=9999";  // 한 페이지 결과 수 (최소 10, 최대 9999)
             urlList.add(temp);
         }
@@ -55,7 +55,8 @@ public class StationInfoApi {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
-            for(int i = 0; i < urlList.size(); i++) {
+            for (int i = 0; i < urlList.size(); i++) {
+                log.info("Start : {}번째", i);
                 String url = urlList.get(i);
                 List<StationInfoDto> tempDto = new ArrayList<>();
 
@@ -79,6 +80,41 @@ public class StationInfoApi {
         }
         return apiDtoList;
     }
+
+    // 테스트용
+    public List<StationInfoDto> callStationInfoApiForTest() {
+        List<StationInfoDto> apiDtoList = new ArrayList<>();
+        String url = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
+                + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
+                + "&pageNo=1" // 페이지번호
+                + "&numOfRows=9999";  // 한 페이지 결과 수 (최소 10, 최대 9999)
+
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+
+            List<StationInfoDto> tempDto = new ArrayList<>();
+
+            Document parse = dBuilder.parse(url);
+            parse.getDocumentElement().normalize();
+            NodeList nList = parse.getElementsByTagName("item");
+
+            for (int j = 0; j < nList.getLength(); j++) {
+                Node item = nList.item(j);
+                if (item.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) item;
+                    StationInfoDto dto = buildStationInfoDto(element);
+                    apiDtoList.add(dto);
+                }
+            }
+
+            log.info("Dto transform END");
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+        }
+        return apiDtoList;
+    }
+
 
     // 전체 개수 가져오는 메소드
     private int getTotalCount() {
@@ -210,7 +246,7 @@ public class StationInfoApi {
         GeometryFactory geometryFactory = new GeometryFactory();
         double lat = Double.parseDouble(latitude);
         double lng = Double.parseDouble(longitude);
-        Point point = geometryFactory.createPoint(new Coordinate(lng, lat));
+        Point point = geometryFactory.createPoint(new Coordinate(lat, lng));        // 변경 해봐야할 부분
         int SRID = 4326;
         point.setSRID(SRID);
 

@@ -47,7 +47,7 @@ public class StationInfo {
     private ChargerType chargerType;
     private String address;
     private String location;
-    private Point point;
+    private Point pointer;
     private String useTime;
     private String businessId;
     private String businessName;    // 기관명
@@ -95,7 +95,7 @@ public class StationInfo {
                 .chargerType(dto.getChargerType())
                 .address(dto.getAddress())
                 .location(dto.getLocation())
-                .point(dto.getPosition())
+                .pointer(dto.getPosition())
                 .useTime(dto.getUseTime())
                 .businessId(dto.getBusinessId())
                 .businessName(dto.getBusinessName())

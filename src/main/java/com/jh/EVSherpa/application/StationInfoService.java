@@ -1,7 +1,6 @@
 package com.jh.EVSherpa.application;
 
 import com.jh.EVSherpa.api.StationInfoApi;
-import com.jh.EVSherpa.domain.StationInfo;
 import com.jh.EVSherpa.dto.StationInfoDto;
 import com.jh.EVSherpa.dto.StationInfoUpdateDto;
 import com.jh.EVSherpa.repository.StationInfoRepository;
@@ -24,12 +23,17 @@ public class StationInfoService {
     public int saveStationInfo() {
         // api 호출 - StationInfo
         List<List<StationInfoDto>> stationInfoDtos = stationInfoApi.callStationInfoApi();
-        List<StationInfoDto> tempStationInfoDtos = stationInfoDtos.get(0);
-        log.info("count: {}",String.valueOf(stationInfoDtos.size()));
+        log.info("count: {}", stationInfoDtos.size());
         // 전체 저장 실행
-        List<StationInfo> stationInfos = stationInfoRepository.saveAll(tempStationInfoDtos);
+        return stationInfoRepository.saveAllList(stationInfoDtos);
+    }
 
-        return stationInfos.size();
+    public int saveStationInfoForTest() {
+        // api 호출 - StationInfo
+        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApiForTest();
+        log.info("count: {}", stationInfoDtos.size());
+        // 전체 저장 실행
+        return stationInfoRepository.saveAll(stationInfoDtos);
     }
 
     // 충전소 정보 update 메서드  (사용자 사용 X)

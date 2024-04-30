@@ -28,7 +28,7 @@ public class StationInfoRepository {
     }
 
     //전체 저장 메서드
-    public List<StationInfo> saveAll(List<StationInfoDto> requests) {
+    public int saveAll(List<StationInfoDto> requests) {
         List<StationInfo> stationInfos = new ArrayList<>();
         for (int i = 0; i < requests.size(); i++) {
             StationStatus stationStatus = StationStatus.fromInfoDto(requests.get(i));
@@ -38,7 +38,26 @@ public class StationInfoRepository {
         }
         em.flush();
         em.clear();
-        return stationInfos;
+
+        return stationInfos.size();
+    }
+
+    public int saveAllList(List<List<StationInfoDto>> requests) {
+        int totalSaveCount = 0;
+        for(List<StationInfoDto> request : requests) {
+            int count = 0;
+            for (int i = 0; i < request.size(); i++) {
+                StationStatus stationStatus = StationStatus.fromInfoDto(request.get(i));
+                StationInfo stationInfo = StationInfo.fromDto(request.get(i), stationStatus);
+                em.persist(stationInfo);
+                count++;
+            }
+            log.info("{}",count);
+            em.flush();
+            em.clear();
+            totalSaveCount += count;
+        }
+        return totalSaveCount;
     }
 
     public Optional<StationInfo> findById(Long id) {

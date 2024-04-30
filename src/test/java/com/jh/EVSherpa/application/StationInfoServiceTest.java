@@ -21,12 +21,27 @@ class StationInfoServiceTest {
     @DisplayName("StationInfoApi를 호출할 때")
     class StationInfoTest {
         @Test
+        @DisplayName("전체 저장 성공 확인")
+        public void testStationInfoApiSaveAll() {
+            Logger logger = LoggerFactory.getLogger(StationInfoTest.class);
+
+            long start = System.currentTimeMillis();
+            int size = stationInfoService.saveStationInfo();
+            long end = System.currentTimeMillis();
+
+            System.out.println("count : " + size);
+            logger.info("실행 시간 : {}s", (float) (end - start) / 1000);
+
+            Assertions.assertThat(size).isGreaterThan(0);
+        }
+
+        @Test
         @DisplayName("저장 성공 확인")
         public void testStationInfoApiSave() {
             Logger logger = LoggerFactory.getLogger(StationInfoTest.class);
 
             long start = System.currentTimeMillis();
-            int size = stationInfoService.saveStationInfo();
+            int size = stationInfoService.saveStationInfoForTest();
             long end = System.currentTimeMillis();
 
             System.out.println("count : " + size);
