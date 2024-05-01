@@ -55,8 +55,8 @@ public class StationInfoApi {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
-            for (int i = 0; i < urlList.size(); i++) {
-                log.info("Start : {}번째", i);
+            for (int i = 0; i < 20/*urlList.size()*/; i++) {
+                log.info("callStationInfoApi : {}번째", i);
                 String url = urlList.get(i);
                 List<StationInfoDto> tempDto = new ArrayList<>();
 
@@ -92,8 +92,6 @@ public class StationInfoApi {
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-
-            List<StationInfoDto> tempDto = new ArrayList<>();
 
             Document parse = dBuilder.parse(url);
             parse.getDocumentElement().normalize();
@@ -139,14 +137,14 @@ public class StationInfoApi {
     }
 
     // StationInfoUpdate를 반환하는 API 호출 메소드
-    public List<StationInfoUpdateDto> callStationInfoApiForUpdate() {
+    public List<StationInfoUpdateDto> callStationInfoApiForUpdateForTest() {
         long start = System.currentTimeMillis();
         List<StationInfoUpdateDto> apiDto = new ArrayList<>();
 
         String url = /*URL*/ "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
                 + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=" + keyInfo.getServerKey() /*Service Key*/
                 + "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("1", StandardCharsets.UTF_8) /*페이지번호*/
-                + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("3000", StandardCharsets.UTF_8);  /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+                + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("9999", StandardCharsets.UTF_8);  /*한 페이지 결과 수 (최소 10, 최대 9999)*/
 //               + "&" + URLEncoder.encode("zcode", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("11", StandardCharsets.UTF_8); /*시도 코드 (행정구역코드 앞 2자리)*/
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -171,6 +169,51 @@ public class StationInfoApi {
         log.info("callStationInfoApiForUpdate : {}s", (float) (end - start) / 1000);
         return apiDto;
     }
+
+    public List<List<StationInfoUpdateDto>> callStationInfoApiForUpdate() {
+        List<List<StationInfoUpdateDto>> apiDtoList = new ArrayList<>();
+        List<String> urlList = new ArrayList<>();
+        int totalCount = getTotalCount();
+        int pageCount = (totalCount / 9999) + 1;
+
+        for (int i = 1; i <= pageCount; i++) {
+            String temp = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
+                    + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
+                    + "&pageNo=" + i // 페이지번호
+                    + "&numOfRows=9999";  // 한 페이지 결과 수 (최소 10, 최대 9999)
+            urlList.add(temp);
+        }
+
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+
+            for (int i = 0; i < 20/*urlList.size()*/; i++) {
+                log.info("Start : {}번째", i);
+                String url = urlList.get(i);
+                List<StationInfoUpdateDto> tempDto = new ArrayList<>();
+
+                Document parse = dBuilder.parse(url);
+                parse.getDocumentElement().normalize();
+                NodeList nList = parse.getElementsByTagName("item");
+
+                for (int j = 0; j < nList.getLength(); j++) {
+                    Node item = nList.item(j);
+                    if (item.getNodeType() == Node.ELEMENT_NODE) {
+                        Element element = (Element) item;
+                        StationInfoUpdateDto dto = buildStationInfoUpdateDto(element);
+                        tempDto.add(dto);
+                    }
+                }
+                apiDtoList.add(tempDto);
+            }
+            log.info("Dto transform END");
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+        }
+        return apiDtoList;
+    }
+
 
     //ChargerInfoDto 생성 메서드
     private StationInfoDto buildStationInfoDto(Element element) {

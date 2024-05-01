@@ -36,6 +36,13 @@ public class StationInfoController {    // TODO: IP 제한
         return ResponseEntity.ok(updateCount);
     }
 
+    // update api 강제 호출 (사용자 ㅍ X)
+    @PutMapping("/update/test")
+    public ResponseEntity<Integer> updateStationInfoForTest() {
+        int updateCount = stationInfoService.updateStationInfoForTest();
+        return ResponseEntity.ok(updateCount);
+    }
+
     // 전체 정보 update 강제 호출 (사용자 사용 X)
     @PutMapping("/update/all")
     public ResponseEntity<Integer> updateStationAllInfo() {

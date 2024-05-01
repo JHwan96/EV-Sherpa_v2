@@ -39,7 +39,16 @@ public class StationInfoService {
     // 충전소 정보 update 메서드  (사용자 사용 X)
     public int updateStationInfo() {
         // api 호출 - StationInfo
-        List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdate();
+        List<List<StationInfoUpdateDto>> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdate();
+        log.info("{}",stationInfoUpdateDtos.size());
+        // stationInfo 정보 갱신
+        return stationInfoRepository.updateAllList(stationInfoUpdateDtos);
+    }
+
+    // 충전소 정보 update 메서드  (사용자 사용 X)
+    public int updateStationInfoForTest() {
+        // api 호출 - StationInfo
+        List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdateForTest();
         // stationInfo 정보 갱신
         return stationInfoRepository.updateAll(stationInfoUpdateDtos);
     }

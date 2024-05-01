@@ -44,7 +44,7 @@ public class StationInfoRepository {
 
     public int saveAllList(List<List<StationInfoDto>> requests) {
         int totalSaveCount = 0;
-        for(List<StationInfoDto> request : requests) {
+        for (List<StationInfoDto> request : requests) {
             int count = 0;
             for (int i = 0; i < request.size(); i++) {
                 StationStatus stationStatus = StationStatus.fromInfoDto(request.get(i));
@@ -52,7 +52,7 @@ public class StationInfoRepository {
                 em.persist(stationInfo);
                 count++;
             }
-            log.info("{}",count);
+            log.info("{}", count);
             em.flush();
             em.clear();
             totalSaveCount += count;
@@ -114,6 +114,48 @@ public class StationInfoRepository {
         }
         log.info("update count : {}", count);
         return count;
+    }
+
+    public int updateAllList(List<List<StationInfoUpdateDto>> requestList) {
+        int totalCount = 0;
+        String jpql = "UPDATE StationInfo si SET " +
+                "si.chargerType = :chargerType, " +
+                "si.useTime = :useTime, " +
+                "si.operatorName = :operatorName, " +
+                "si.operatorCall = :operatorCall, " +
+                "si.output = :output, " +
+                "si.parkingFree = :parkingFree, " +
+                "si.notation = :notation, " +
+                "si.limitYn = :limitYn, " +
+                "si.limitDetail = :limitDetail, " +
+                "si.deleteYn = :deleteYn, " +
+                "si.deleteDetail = :deleteDetail, " +
+                "si.trafficYn = :trafficYn " +
+                "WHERE si.stationChargerId = :stationChargerId";
+        for (List<StationInfoUpdateDto> requests : requestList) {
+            int count = 0;
+            for (StationInfoUpdateDto request : requests) {
+                int i = em.createQuery(jpql)
+                        .setParameter("chargerType", request.getChargerType())
+                        .setParameter("useTime", request.getUseTime())
+                        .setParameter("operatorName", request.getOperatorName())
+                        .setParameter("operatorCall", request.getOperatorCall())
+                        .setParameter("output", request.getOutput())
+                        .setParameter("parkingFree", request.getParkingFree())
+                        .setParameter("notation", request.getNotation())
+                        .setParameter("limitYn", request.getLimitYn())
+                        .setParameter("limitDetail", request.getLimitDetail())
+                        .setParameter("deleteYn", request.getDeleteYn())
+                        .setParameter("deleteDetail", request.getDeleteDetail())
+                        .setParameter("trafficYn", request.getTrafficYn())
+                        .setParameter("stationChargerId", request.getStationChargerId())
+                        .executeUpdate();
+                count += i;
+            }
+            totalCount += count;
+        }
+        log.info("update count : {}", totalCount);
+        return totalCount;
     }
 
     // 전체 정보 갱신 메서드 (7~30일 마다 한번씩 갱신)
