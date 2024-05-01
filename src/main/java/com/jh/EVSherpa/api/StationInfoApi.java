@@ -81,13 +81,13 @@ public class StationInfoApi {
         return apiDtoList;
     }
 
-    // 테스트용
-    public List<StationInfoDto> callStationInfoApiForTest() {
+    // 테스트용 (XML)
+    public List<StationInfoDto> callStationInfoApiForXML() {
         List<StationInfoDto> apiDtoList = new ArrayList<>();
         String url = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
                 + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
                 + "&pageNo=1" // 페이지번호
-                + "&numOfRows=9999";  // 한 페이지 결과 수 (최소 10, 최대 9999)
+                + "&numOfRows=8000";  // 한 페이지 결과 수 (최소 10, 최대 9999)
 
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -112,6 +112,40 @@ public class StationInfoApi {
         }
         return apiDtoList;
     }
+
+    // 테스트용2 (JSON)
+    public List<StationInfoDto> callStationInfoApiForJson() {
+        List<StationInfoDto> apiDtoList = new ArrayList<>();
+        String url = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
+                + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
+                + "&pageNo=1" // 페이지번호
+                + "&numOfRows=8000"  // 한 페이지 결과 수 (최소 10, 최대 9999)
+                + "dataType=JSON";
+
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+
+            Document parse = dBuilder.parse(url);
+            parse.getDocumentElement().normalize();
+            NodeList nList = parse.getElementsByTagName("item");
+
+            for (int j = 0; j < nList.getLength(); j++) {
+                Node item = nList.item(j);
+                if (item.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) item;
+                    StationInfoDto dto = buildStationInfoDto(element);
+                    apiDtoList.add(dto);
+                }
+            }
+
+            log.info("Dto transform END");
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+        }
+        return apiDtoList;
+    }
+
 
 
     // 전체 개수 가져오는 메소드
@@ -237,6 +271,7 @@ public class StationInfoApi {
                 .output(integerToString(element, "output"))
                 .chargerMethod(ChargerMethod.of(getTextFromTag(element, "method")))
                 .zcode(getTextFromTag(element, "zcode"))
+                .zscode(getTextFromTag(element, "zscode"))
                 .kind(getTextFromTag(element, "kind"))
                 .kindDetail(getTextFromTag(element, "kindDetail"))
                 .parkingFree(getTextFromTag(element, "parkingFree"))

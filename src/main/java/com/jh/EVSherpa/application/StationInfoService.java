@@ -19,6 +19,26 @@ public class StationInfoService {
     private final StationInfoApi stationInfoApi;
     private final StationInfoRepository stationInfoRepository;
 
+    // 충전소 9999개만 저장 (테스트용)
+    public int saveStationInfoForTest() {
+        // api 호출 - StationInfo
+        long start = System.currentTimeMillis();
+        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApiForXML();
+        log.info("callStationInfoApiForTest: {}s", (float)(System.currentTimeMillis()-start)/1000);
+        log.info("count: {}", stationInfoDtos.size());
+
+        return stationInfoRepository.saveAll(stationInfoDtos);
+    }
+
+    // 충전소 9999개만 갱신 (테스트용)
+    public int updateStationInfoForTest() {
+        // api 호출 - StationInfo
+        long start = System.currentTimeMillis();
+        List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdateForTest();
+        log.info("callStationInfoApiForTest: {}s", (float)(System.currentTimeMillis()-start)/1000);
+        return stationInfoRepository.updateAll(stationInfoUpdateDtos);
+    }
+
     // StationInfoApi 호출 및 저장 메서드 (사용자 사용 X)
     public int saveStationInfo() {
         // api 호출 - StationInfo
@@ -26,14 +46,6 @@ public class StationInfoService {
         log.info("count: {}", stationInfoDtos.size());
         // 전체 저장 실행
         return stationInfoRepository.saveAllList(stationInfoDtos);
-    }
-
-    public int saveStationInfoForTest() {
-        // api 호출 - StationInfo
-        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApiForTest();
-        log.info("count: {}", stationInfoDtos.size());
-        // 전체 저장 실행
-        return stationInfoRepository.saveAll(stationInfoDtos);
     }
 
     // 충전소 정보 update 메서드  (사용자 사용 X)
@@ -45,13 +57,6 @@ public class StationInfoService {
         return stationInfoRepository.updateAllList(stationInfoUpdateDtos);
     }
 
-    // 충전소 정보 update 메서드  (사용자 사용 X)
-    public int updateStationInfoForTest() {
-        // api 호출 - StationInfo
-        List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdateForTest();
-        // stationInfo 정보 갱신
-        return stationInfoRepository.updateAll(stationInfoUpdateDtos);
-    }
 
     // 충전소 정보 전체 update 메서드  (사용자 사용 X)
     public int updateStationAllInfo() {

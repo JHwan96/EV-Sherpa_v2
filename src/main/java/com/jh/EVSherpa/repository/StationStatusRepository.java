@@ -59,7 +59,7 @@ public class StationStatusRepository {
                 "ss.stationUpdateDate = :stationUpdateDate, " +
                 "ss.lastChargeStart = :lastChargeStart, " +
                 "ss.lastChargeEnd = :lastChargeEnd, " +
-                "ss.nowChargeStart = :lastChargeStart " +
+                "ss.nowChargeStart = :nowChargeStart " +
                 "WHERE ss.stationChargerId = :stationChargerId";
         for (StationStatusDto request : requests) {
             int i = em.createQuery(jpql)

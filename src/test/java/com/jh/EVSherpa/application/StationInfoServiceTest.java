@@ -44,7 +44,6 @@ class StationInfoServiceTest {
             int size = stationInfoService.saveStationInfoForTest();
             long end = System.currentTimeMillis();
 
-            System.out.println("count : " + size);
             logger.info("실행 시간 : {}s", (float) (end - start) / 1000);
 
             Assertions.assertThat(size).isGreaterThan(0);
