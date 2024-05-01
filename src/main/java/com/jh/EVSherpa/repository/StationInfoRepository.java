@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,39 +19,27 @@ import java.util.Optional;
 public class StationInfoRepository {
     private final EntityManager em;
 
-    public StationInfo save(StationInfoDto request) {
-        StationStatus stationStatus = StationStatus.fromInfoDto(request);
-        StationInfo stationInfo = StationInfo.fromDto(request, stationStatus);
-        em.persist(stationInfo);
-        return stationInfo;
-    }
-
     //전체 저장 메서드
     public int saveAll(List<StationInfoDto> requests) {
-        List<StationInfo> stationInfos = new ArrayList<>();
-        for (int i = 0; i < requests.size(); i++) {
-            StationStatus stationStatus = StationStatus.fromInfoDto(requests.get(i));
-            StationInfo stationInfo = StationInfo.fromDto(requests.get(i), stationStatus);
-            em.persist(stationInfo);
-            stationInfos.add(stationInfo);
+        int count = 0;
+        for (StationInfoDto request : requests) {
+            StationInfo saveStationInfo = save(request);
+            count++;
         }
         em.flush();
         em.clear();
-
-        return stationInfos.size();
+        return count;
     }
 
-    public int saveAllList(List<List<StationInfoDto>> requests) {
+    public int saveAllList(List<List<StationInfoDto>> requestList) {
         int totalSaveCount = 0;
-        for (List<StationInfoDto> request : requests) {
+        for (List<StationInfoDto> requests : requestList) {
             int count = 0;
-            for (int i = 0; i < request.size(); i++) {
-                StationStatus stationStatus = StationStatus.fromInfoDto(request.get(i));
-                StationInfo stationInfo = StationInfo.fromDto(request.get(i), stationStatus);
-                em.persist(stationInfo);
+            for (StationInfoDto request : requests) {
+                StationInfo saveStationInfo = save(request);
                 count++;
             }
-            log.info("{}", count);
+            log.info("saveAllList : {}", count);
             em.flush();
             em.clear();
             totalSaveCount += count;
@@ -78,24 +65,24 @@ public class StationInfoRepository {
                 .getResultList();
     }
 
+    String JPQL = "UPDATE StationInfo si SET " +
+            "si.chargerType = :chargerType, " +
+            "si.useTime = :useTime, " +
+            "si.operatorName = :operatorName, " +
+            "si.operatorCall = :operatorCall, " +
+            "si.output = :output, " +
+            "si.parkingFree = :parkingFree, " +
+            "si.notation = :notation, " +
+            "si.limitYn = :limitYn, " +
+            "si.limitDetail = :limitDetail, " +
+            "si.deleteYn = :deleteYn, " +
+            "si.deleteDetail = :deleteDetail, " +
+            "si.trafficYn = :trafficYn " +
+            "WHERE si.stationChargerId = :stationChargerId";
     public int updateAll(List<StationInfoUpdateDto> requests) {
         int count = 0;
-        String jpql = "UPDATE StationInfo si SET " +
-                "si.chargerType = :chargerType, " +
-                "si.useTime = :useTime, " +
-                "si.operatorName = :operatorName, " +
-                "si.operatorCall = :operatorCall, " +
-                "si.output = :output, " +
-                "si.parkingFree = :parkingFree, " +
-                "si.notation = :notation, " +
-                "si.limitYn = :limitYn, " +
-                "si.limitDetail = :limitDetail, " +
-                "si.deleteYn = :deleteYn, " +
-                "si.deleteDetail = :deleteDetail, " +
-                "si.trafficYn = :trafficYn " +
-                "WHERE si.stationChargerId = :stationChargerId";
         for (StationInfoUpdateDto request : requests) {
-            int i = em.createQuery(jpql)
+            int i = em.createQuery(JPQL)
                     .setParameter("chargerType", request.getChargerType())
                     .setParameter("useTime", request.getUseTime())
                     .setParameter("operatorName", request.getOperatorName())
@@ -118,24 +105,10 @@ public class StationInfoRepository {
 
     public int updateAllList(List<List<StationInfoUpdateDto>> requestList) {
         int totalCount = 0;
-        String jpql = "UPDATE StationInfo si SET " +
-                "si.chargerType = :chargerType, " +
-                "si.useTime = :useTime, " +
-                "si.operatorName = :operatorName, " +
-                "si.operatorCall = :operatorCall, " +
-                "si.output = :output, " +
-                "si.parkingFree = :parkingFree, " +
-                "si.notation = :notation, " +
-                "si.limitYn = :limitYn, " +
-                "si.limitDetail = :limitDetail, " +
-                "si.deleteYn = :deleteYn, " +
-                "si.deleteDetail = :deleteDetail, " +
-                "si.trafficYn = :trafficYn " +
-                "WHERE si.stationChargerId = :stationChargerId";
         for (List<StationInfoUpdateDto> requests : requestList) {
             int count = 0;
             for (StationInfoUpdateDto request : requests) {
-                int i = em.createQuery(jpql)
+                int i = em.createQuery(JPQL)
                         .setParameter("chargerType", request.getChargerType())
                         .setParameter("useTime", request.getUseTime())
                         .setParameter("operatorName", request.getOperatorName())
@@ -227,6 +200,13 @@ public class StationInfoRepository {
         Optional<StationInfo> findId = findById(id);
         StationInfo stationInfo = findId.orElseThrow(() -> new NotFoundException("적절한 StationInfo가 없습니다."));
         em.remove(stationInfo);
+        return stationInfo;
+    }
+
+    private StationInfo save(StationInfoDto request) {
+        StationStatus stationStatus = StationStatus.fromInfoDto(request);
+        StationInfo stationInfo = StationInfo.fromDto(request, stationStatus);
+        em.persist(stationInfo);
         return stationInfo;
     }
 }
