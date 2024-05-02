@@ -9,6 +9,11 @@ import com.jh.EVSherpa.exception.ApiProblemException;
 import com.jh.EVSherpa.global.config.KeyInfo;
 import com.jh.EVSherpa.global.utility.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -29,11 +34,17 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Component
 @Slf4j
@@ -125,12 +136,80 @@ public class StationInfoApi {
         String urlBuilder = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
                 + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
                 + "&pageNo=1" /*페이지번호*/
-                + "&numOfRows=9999" /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+                + "&numOfRows=3000" /*한 페이지 결과 수 (최소 10, 최대 9999)*/
                 + "&dataType=JSON";
+
+/*        long start = System.currentTimeMillis();
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(urlBuilder);
+        try(CloseableHttpResponse response = httpClient.execute(httpGet)) {
+            String result = EntityUtils.toString(response.getEntity());
+            log.info("Api Call: {}s", (float)(System.currentTimeMillis() - start) / 1000);
+            try {
+                JSONParser jsonParser = new JSONParser();
+                JSONObject parse = (JSONObject) jsonParser.parse(result);
+                long totalCount = (long) parse.get("totalCount");
+
+                JSONObject items = (JSONObject) parse.get("items");
+                JSONArray item = (JSONArray) items.get("item");
+
+                for (int i = 0; i < item.size(); i++) {
+                    JSONObject jsonObject = (JSONObject) item.get(i);
+                    StationInfoDto stationInfo = getStationInfoDtoFronJson(jsonObject);
+                    apiDtoList.add(stationInfo);
+                }
+                log.info("dtoList size : {}", apiDtoList.size());
+            } catch (Exception e) {
+                throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+            }
+        } catch (Exception e){
+            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+        }*/
+
+       /* HttpClient httpClient = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlBuilder))
+                .build();
+        CompletableFuture<HttpResponse<String>> future = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        CompletableFuture<List<StationInfoDto>> asyncDtoList = future.thenApply(HttpResponse::body)
+                .thenApplyAsync(result -> {
+                    List<StationInfoDto> apiDtoList = new ArrayList<>();
+                    try {
+                        JSONParser jsonParser = new JSONParser();
+                        JSONObject parse = (JSONObject) jsonParser.parse(result);
+                        long totalCount = (long) parse.get("totalCount");
+
+                        JSONObject items = (JSONObject) parse.get("items");
+                        JSONArray item = (JSONArray) items.get("item");
+
+                        for (int i = 0; i < item.size(); i++) {
+                            JSONObject jsonObject = (JSONObject) item.get(i);
+                            StationInfoDto stationInfo = getStationInfoDtoFronJson(jsonObject);
+                            apiDtoList.add(stationInfo);
+                        }
+                        log.info("dtoList size : {}", apiDtoList.size());
+                    } catch (Exception e) {
+                        throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+                    }
+                    return apiDtoList;
+                })
+                .exceptionally(ex -> {
+                    throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+                });
+
         try {
+            return asyncDtoList.get();
+        } catch (Exception e) {
+            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+        }
+*/
+
+        try {
+            long start = System.currentTimeMillis();
             URL url = new URL(urlBuilder);
             BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
             String result = br.readLine();
+            log.info("Api Call: {}s", (float)(System.currentTimeMillis() - start) / 1000);
 
             JSONParser jsonParser = new JSONParser();
             JSONObject parse = (JSONObject) jsonParser.parse(result);
@@ -139,11 +218,13 @@ public class StationInfoApi {
             JSONObject items = (JSONObject) parse.get("items");
             JSONArray item = (JSONArray) items.get("item");
 
+
             for (int i = 0; i < item.size(); i++) {
                 JSONObject jsonObject = (JSONObject) item.get(i);
                 StationInfoDto stationInfo = getStationInfoDtoFronJson(jsonObject);
                 apiDtoList.add(stationInfo);
             }
+
             log.info("dtoList size : {}", apiDtoList.size());
         } catch (Exception e) {
             throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
@@ -151,31 +232,7 @@ public class StationInfoApi {
         return apiDtoList;
     }
 
-
-    // 전체 개수 가져오는 메소드
-
-    private int getTotalCount() {
-        String url = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
-                + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
-                + "&pageNo=1" /*페이지번호*/
-                + "&numOfRows=10";  /*한 페이지 결과 수 (최소 10, 최대 9999)*/
-        int totalCount;
-        try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document parse = dBuilder.parse(url);
-
-            Element headerElement = (Element) parse.getElementsByTagName("header").item(0);
-            Element totalCountElement = (Element) headerElement.getElementsByTagName("totalCount").item(0);
-            String total = totalCountElement.getTextContent();
-            totalCount = Integer.parseInt(total);
-        } catch (IOException | ParserConfigurationException | SAXException e) {
-            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
-        }
-        return totalCount;
-    }
     // StationInfoUpdate를 반환하는 API 호출 메소드
-
     public List<StationInfoUpdateDto> callStationInfoApiForUpdateForTest() {
         long start = System.currentTimeMillis();
         List<StationInfoUpdateDto> apiDto = new ArrayList<>();
@@ -253,6 +310,28 @@ public class StationInfoApi {
         return apiDtoList;
     }
 
+    // 전체 개수 가져오는 메소드
+
+    private int getTotalCount() {
+        String url = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
+                + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
+                + "&pageNo=1" /*페이지번호*/
+                + "&numOfRows=10";  /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+        int totalCount;
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document parse = dBuilder.parse(url);
+
+            Element headerElement = (Element) parse.getElementsByTagName("header").item(0);
+            Element totalCountElement = (Element) headerElement.getElementsByTagName("totalCount").item(0);
+            String total = totalCountElement.getTextContent();
+            totalCount = Integer.parseInt(total);
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+        }
+        return totalCount;
+    }
 
     private StationInfoDto getStationInfoDtoFronJson(JSONObject jsonObject) {
         return StationInfoDto.builder()

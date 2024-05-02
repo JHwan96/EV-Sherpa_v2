@@ -26,6 +26,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-aop")
 	implementation("org.hibernate:hibernate-spatial:6.2.5.Final")
+	implementation("org.apache.httpcomponents:httpclient:4.3.4")
 	implementation ("com.googlecode.json-simple:json-simple:1.1.1")
 	implementation ("org.springframework.boot:spring-boot-starter-security")
 	compileOnly("org.projectlombok:lombok")
