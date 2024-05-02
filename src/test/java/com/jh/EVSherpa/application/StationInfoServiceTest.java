@@ -41,7 +41,7 @@ class StationInfoServiceTest {
             Logger logger = LoggerFactory.getLogger(StationInfoTest.class);
 
             long start = System.currentTimeMillis();
-            int size = stationInfoService.saveStationInfoForTest();
+            int size = stationInfoService.saveStationInfoForJsonTest();
             long end = System.currentTimeMillis();
 
             logger.info("실행 시간 : {}s", (float) (end - start) / 1000);

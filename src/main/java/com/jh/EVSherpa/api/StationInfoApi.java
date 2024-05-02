@@ -9,6 +9,9 @@ import com.jh.EVSherpa.exception.ApiProblemException;
 import com.jh.EVSherpa.global.config.KeyInfo;
 import com.jh.EVSherpa.global.utility.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -23,7 +26,10 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -116,39 +122,38 @@ public class StationInfoApi {
     // 테스트용2 (JSON)
     public List<StationInfoDto> callStationInfoApiForJson() {
         List<StationInfoDto> apiDtoList = new ArrayList<>();
-        String url = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
+        String urlBuilder = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
                 + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
-                + "&pageNo=1" // 페이지번호
-                + "&numOfRows=8000"  // 한 페이지 결과 수 (최소 10, 최대 9999)
-                + "dataType=JSON";
-
+                + "&pageNo=1" /*페이지번호*/
+                + "&numOfRows=9999" /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+                + "&dataType=JSON";
         try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            URL url = new URL(urlBuilder);
+            BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
+            String result = br.readLine();
 
-            Document parse = dBuilder.parse(url);
-            parse.getDocumentElement().normalize();
-            NodeList nList = parse.getElementsByTagName("item");
+            JSONParser jsonParser = new JSONParser();
+            JSONObject parse = (JSONObject) jsonParser.parse(result);
+            long totalCount = (long) parse.get("totalCount");
 
-            for (int j = 0; j < nList.getLength(); j++) {
-                Node item = nList.item(j);
-                if (item.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) item;
-                    StationInfoDto dto = buildStationInfoDto(element);
-                    apiDtoList.add(dto);
-                }
+            JSONObject items = (JSONObject) parse.get("items");
+            JSONArray item = (JSONArray) items.get("item");
+
+            for (int i = 0; i < item.size(); i++) {
+                JSONObject jsonObject = (JSONObject) item.get(i);
+                StationInfoDto stationInfo = getStationInfoDtoFronJson(jsonObject);
+                apiDtoList.add(stationInfo);
             }
-
-            log.info("Dto transform END");
-        } catch (IOException | ParserConfigurationException | SAXException e) {
+            log.info("dtoList size : {}", apiDtoList.size());
+        } catch (Exception e) {
             throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
         }
         return apiDtoList;
     }
 
 
-
     // 전체 개수 가져오는 메소드
+
     private int getTotalCount() {
         String url = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
                 + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
@@ -169,8 +174,8 @@ public class StationInfoApi {
         }
         return totalCount;
     }
-
     // StationInfoUpdate를 반환하는 API 호출 메소드
+
     public List<StationInfoUpdateDto> callStationInfoApiForUpdateForTest() {
         long start = System.currentTimeMillis();
         List<StationInfoUpdateDto> apiDto = new ArrayList<>();
@@ -249,6 +254,40 @@ public class StationInfoApi {
     }
 
 
+    private StationInfoDto getStationInfoDtoFronJson(JSONObject jsonObject) {
+        return StationInfoDto.builder()
+                .stationName(getStringFromJson(jsonObject, "statNm"))
+                .stationChargerId(getStringFromJson(jsonObject, "statId") + getStringFromJson(jsonObject, "chgerId"))
+                .chargerType(ChargerType.of(getStringFromJson(jsonObject, "chgerType")))
+                .address(getStringFromJson(jsonObject, "addr"))
+                .location(getStringFromJson(jsonObject, "location"))
+                .position(getPositionFromString(getStringFromJson(jsonObject, "lat"), getStringFromJson(jsonObject, "lng")))
+                .useTime(getStringFromJson(jsonObject, "useTime"))
+                .businessId(getStringFromJson(jsonObject, "busiId"))
+                .businessName(getStringFromJson(jsonObject, "bnm"))
+                .operatorName(getStringFromJson(jsonObject, "busiNm"))
+                .operatorCall(getStringFromJson(jsonObject, "busiCall"))
+                .status(ChargerStatus.of(getStringFromJson(jsonObject, "stat")))
+                .stationUpdateDate(DateTimeUtils.dateTimeFormat(getStringFromJson(jsonObject, "statUpdDt")))
+                .lastChargeStart(DateTimeUtils.dateTimeFormat(getStringFromJson(jsonObject, "lastTsdt")))
+                .lastChargeEnd(DateTimeUtils.dateTimeFormat(getStringFromJson(jsonObject, "lastTedt")))
+                .nowChargeStart(DateTimeUtils.dateTimeFormat(getStringFromJson(jsonObject, "nowTsdt")))
+                .output(stringToIntegerJson(jsonObject, "output"))
+                .chargerMethod(ChargerMethod.of(getStringFromJson(jsonObject, "method")))
+                .zcode(getStringFromJson(jsonObject, "zcode"))
+                .zscode(getStringFromJson(jsonObject, "zscode"))
+                .kind(getStringFromJson(jsonObject, "kind"))
+                .kindDetail(getStringFromJson(jsonObject, "kindDetail"))
+                .parkingFree(getStringFromJson(jsonObject, "parkingFree"))
+                .notation(getStringFromJson(jsonObject, "note"))
+                .limitYn(getStringFromJson(jsonObject, "limitYn"))
+                .limitDetail(getStringFromJson(jsonObject, "limitDetail"))
+                .deleteYn(getStringFromJson(jsonObject, "delYn"))
+                .deleteDetail(getStringFromJson(jsonObject, "delDetail"))
+                .trafficYn(getStringFromJson(jsonObject, "trafficYn"))
+                .build();
+    }
+
     //ChargerInfoDto 생성 메서드
     private StationInfoDto buildStationInfoDto(Element element) {
         return StationInfoDto.builder()
@@ -268,7 +307,7 @@ public class StationInfoApi {
                 .lastChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "lastTsdt")))
                 .lastChargeEnd(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "lastTedt")))
                 .nowChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "nowTsdt")))
-                .output(integerToString(element, "output"))
+                .output(stringToInteger(element, "output"))
                 .chargerMethod(ChargerMethod.of(getTextFromTag(element, "method")))
                 .zcode(getTextFromTag(element, "zcode"))
                 .zscode(getTextFromTag(element, "zscode"))
@@ -291,7 +330,7 @@ public class StationInfoApi {
                 .useTime(getTextFromTag(element, "useTime"))
                 .operatorName(getTextFromTag(element, "busiNm"))
                 .operatorCall(getTextFromTag(element, "busiCall"))
-                .output(integerToString(element, "output"))
+                .output(stringToInteger(element, "output"))
                 .status(ChargerStatus.of(getTextFromTag(element, "stat")))
                 .stationUpdateDate(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "statUpdDt")))
                 .lastChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "lastTsdt")))
@@ -307,8 +346,21 @@ public class StationInfoApi {
                 .build();
     }
 
-    private Integer integerToString(Element element, String tag) {
+    private String getStringFromJson(JSONObject jsonObject, String key) {
+        return (String) jsonObject.get(key);
+    }
+
+    private Integer stringToInteger(Element element, String tag) {
         String output = getTextFromTag(element, tag);
+        if (output.isEmpty()) {
+            return null;
+        } else {
+            return Integer.parseInt(output);
+        }
+    }
+
+    private Integer stringToIntegerJson(JSONObject jsonObject, String key) {
+        String output = getStringFromJson(jsonObject, key);
         if (output.isEmpty()) {
             return null;
         } else {

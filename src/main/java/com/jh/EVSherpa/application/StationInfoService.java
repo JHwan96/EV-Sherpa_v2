@@ -30,7 +30,17 @@ public class StationInfoService {
         return stationInfoRepository.saveAll(stationInfoDtos);
     }
 
-    // 충전소 9999개만 갱신 (테스트용)
+    public int saveStationInfoForJsonTest() {
+        // api 호출 - StationInfo
+        long start = System.currentTimeMillis();
+        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApiForJson();
+        log.info("callStationInfoApiForTest: {}s", (float)(System.currentTimeMillis()-start)/1000);
+        log.info("count: {}", stationInfoDtos.size());
+
+        return stationInfoRepository.saveAll(stationInfoDtos);
+    }
+
+    // 충전소 N개만 갱신 (테스트용)
     public int updateStationInfoForTest() {
         // api 호출 - StationInfo
         long start = System.currentTimeMillis();
