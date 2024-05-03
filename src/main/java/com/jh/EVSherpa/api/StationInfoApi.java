@@ -9,11 +9,9 @@ import com.jh.EVSherpa.exception.ApiProblemException;
 import com.jh.EVSherpa.global.config.KeyInfo;
 import com.jh.EVSherpa.global.utility.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -31,20 +29,11 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URL;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Component
 @Slf4j
@@ -136,10 +125,45 @@ public class StationInfoApi {
         String urlBuilder = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
                 + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
                 + "&pageNo=1" /*페이지번호*/
-                + "&numOfRows=3000" /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+                + "&numOfRows=9999" /*한 페이지 결과 수 (최소 10, 최대 9999)*/
                 + "&dataType=JSON";
 
-/*        long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
+        try {
+            OkHttpClient okHttpClient = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(urlBuilder)
+                    .build();
+            Response response = okHttpClient.newCall(request).execute();
+            String result = response.body().string();
+
+            log.info("Api Call: {}s", (float) (System.currentTimeMillis() - start) / 1000);
+            try {
+                JSONParser jsonParser = new JSONParser();
+                JSONObject parse = (JSONObject) jsonParser.parse(result);
+                long totalCount = (long) parse.get("totalCount");
+
+                JSONObject items = (JSONObject) parse.get("items");
+                JSONArray item = (JSONArray) items.get("item");
+
+                for (int i = 0; i < item.size(); i++) {
+                    JSONObject jsonObject = (JSONObject) item.get(i);
+                    StationInfoDto stationInfo = getStationInfoDtoFronJson(jsonObject);
+                    apiDtoList.add(stationInfo);
+                }
+                log.info("dtoList size : {}", apiDtoList.size());
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+        }
+
+
+   /*     long start = System.currentTimeMillis();
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(urlBuilder);
         try(CloseableHttpResponse response = httpClient.execute(httpGet)) {
@@ -204,7 +228,7 @@ public class StationInfoApi {
         }
 */
 
-        try {
+/*        try {
             long start = System.currentTimeMillis();
             URL url = new URL(urlBuilder);
             BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
@@ -228,7 +252,7 @@ public class StationInfoApi {
             log.info("dtoList size : {}", apiDtoList.size());
         } catch (Exception e) {
             throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
-        }
+        }*/
         return apiDtoList;
     }
 
