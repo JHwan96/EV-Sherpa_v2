@@ -19,21 +19,11 @@ public class StationInfoService {
     private final StationInfoApi stationInfoApi;
     private final StationInfoRepository stationInfoRepository;
 
-    // 충전소 9999개만 저장 (테스트용)
-    public int saveStationInfoForTest() {
+    // 충전소 정보 9999개 저장 테스트용)
+    public int saveStationInfoForPageTest() {
         // api 호출 - StationInfo
         long start = System.currentTimeMillis();
-        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApiForXML();
-        log.info("callStationInfoApiForTest: {}s", (float)(System.currentTimeMillis()-start)/1000);
-        log.info("count: {}", stationInfoDtos.size());
-
-        return stationInfoRepository.saveAll(stationInfoDtos);
-    }
-
-    public int saveStationInfoForJsonTest() {
-        // api 호출 - StationInfo
-        long start = System.currentTimeMillis();
-        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApiForJson();
+        List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApiForJsonTest();
         log.info("callStationInfoApiForTest: {}s", (float)(System.currentTimeMillis()-start)/1000);
         log.info("count: {}", stationInfoDtos.size());
 
@@ -44,7 +34,8 @@ public class StationInfoService {
     public int updateStationInfoForTest() {
         // api 호출 - StationInfo
         long start = System.currentTimeMillis();
-        List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdateForTest();
+        int totalCount = stationInfoApi.callApiForTotalCount();
+        List<StationInfoUpdateDto> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdateForTest(totalCount);
         log.info("callStationInfoApiForTest: {}s", (float)(System.currentTimeMillis()-start)/1000);
         return stationInfoRepository.updateAll(stationInfoUpdateDtos);
     }
@@ -52,7 +43,8 @@ public class StationInfoService {
     // StationInfoApi 호출 및 저장 메서드 (사용자 사용 X)
     public int saveStationInfo() {
         // api 호출 - StationInfo
-        List<List<StationInfoDto>> stationInfoDtos = stationInfoApi.callStationInfoApi();
+        int totalCount = stationInfoApi.callApiForTotalCount();
+        List<List<StationInfoDto>> stationInfoDtos = stationInfoApi.callStationInfoApiForJson(totalCount);
         log.info("count: {}", stationInfoDtos.size());
         // 전체 저장 실행
         return stationInfoRepository.saveAllList(stationInfoDtos);
@@ -70,7 +62,8 @@ public class StationInfoService {
 
     // 충전소 정보 전체 update 메서드  (사용자 사용 X)
     public int updateStationAllInfo() {
-        List<List<StationInfoDto>> stationInfoDtos = stationInfoApi.callStationInfoApi();
+        int totalCount = stationInfoApi.callApiForTotalCount();
+        List<List<StationInfoDto>> stationInfoDtos = stationInfoApi.callStationInfoApiForJson(totalCount);
         List<StationInfoDto> tempStationInfoDtos = stationInfoDtos.get(0);
         return stationInfoRepository.updateAllInfo(tempStationInfoDtos);
     }

@@ -23,23 +23,12 @@ public class StationInfoController {    // TODO: IP 제한
         return ResponseEntity.ok(stationInfoSize);
     }
 
-    @PostMapping("/save/test")
-    public ResponseEntity<Integer> saveStationInfoFromApiForTest() {
-        int stationInfoSize = stationInfoService.saveStationInfoForTest();
-        return ResponseEntity.ok(stationInfoSize);
-    }
+
 
     // update api 강제 호출 (사용자 ㅍ X)
     @PutMapping("/update")
     public ResponseEntity<Integer> updateStationInfo() {
         int updateCount = stationInfoService.updateStationInfo();
-        return ResponseEntity.ok(updateCount);
-    }
-
-    // update api 강제 호출 (사용자 ㅍ X)
-    @PutMapping("/update/test")
-    public ResponseEntity<Integer> updateStationInfoForTest() {
-        int updateCount = stationInfoService.updateStationInfoForTest();
         return ResponseEntity.ok(updateCount);
     }
 
@@ -49,4 +38,21 @@ public class StationInfoController {    // TODO: IP 제한
         int updateCount = stationInfoService.updateStationAllInfo();
         return ResponseEntity.ok(updateCount);
     }
+
+    // 한 페이지만 저장 (9999개 테스트용)
+    //TODO: 삭제해야함
+    @PostMapping("/save/test")
+    public ResponseEntity<Integer> saveStationInfoFromApiForTest() {
+        int stationInfoSize = stationInfoService.saveStationInfoForPageTest();
+        return ResponseEntity.ok(stationInfoSize);
+    }
+
+    // update api 강제 호출 (사용자 ㅍ X)
+    @PutMapping("/update/test")
+    public ResponseEntity<Integer> updateStationInfoForTest() {
+        int updateCount = stationInfoService.updateStationInfoForTest();
+        return ResponseEntity.ok(updateCount);
+    }
+
+
 }
