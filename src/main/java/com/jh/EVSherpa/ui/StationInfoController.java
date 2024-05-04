@@ -19,10 +19,13 @@ public class StationInfoController {    // TODO: IP 제한
     // save api 강제 호출 (사용자 사용 X)
     @PostMapping("/save")
     public ResponseEntity<Integer> saveStationInfoFromApi() {
+        long start = System.currentTimeMillis();
         int stationInfoSize = stationInfoService.saveStationInfo();
+        long end = System.currentTimeMillis();
+        log.info("time : {}s", (float)(end-start)/1000);
+
         return ResponseEntity.ok(stationInfoSize);
     }
-
 
 
     // update api 강제 호출 (사용자 ㅍ X)
@@ -50,7 +53,7 @@ public class StationInfoController {    // TODO: IP 제한
     // update api 강제 호출 (사용자 ㅍ X)
     @PutMapping("/update/test")
     public ResponseEntity<Integer> updateStationInfoForTest() {
-        int updateCount = stationInfoService.updateStationInfoForTest();
+        int updateCount = stationInfoService.updateStationInfoForPageTest();
         return ResponseEntity.ok(updateCount);
     }
 

@@ -36,7 +36,7 @@ class StationInfoServiceTest {
         }
 
         @Test
-        @DisplayName("저장 성공 확인")
+        @DisplayName("일부만 저장 성공 확인")
         public void testStationInfoApiSave() {
             Logger logger = LoggerFactory.getLogger(StationInfoTest.class);
 
@@ -55,7 +55,7 @@ class StationInfoServiceTest {
             // 충전소 정보 저장 메서드 호출
             stationInfoService.saveStationInfoForPageTest();
             // 충전소 정보 갱신 메서드 호출
-            int stationInfos = stationInfoService.updateStationInfoForTest();
+            int stationInfos = stationInfoService.updateStationInfoForPageTest();
             Assertions.assertThat(stationInfos).isNotEqualTo(0);
         }
 

@@ -47,13 +47,14 @@ public class StationInfoApi {
     KeyInfo keyInfo;
 
     //TODO: 사용할 것 (JSON)
-    public List<List<StationInfoDto>> callStationInfoApiForJson(int totalCount) {
+    // 전체 저장
+    public List<List<StationInfoDto>> callAllStationInfoApi(int totalCount) {
         List<List<StationInfoDto>> apiDtoLists = new ArrayList<>();
         List<String> urlList = new ArrayList<>();
         int pageCount = (totalCount / 9999) + 1;
         log.info("totalCountJson : {}, pageCount : {}", totalCount, pageCount);
 
-        for(int i = 1; i < 3/*pageCount*/; i ++) {
+        for(int i = 1; i < pageCount; i ++) {
             String tempStr = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
                     + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
                     + "&pageNo="+i /*페이지번호*/
@@ -107,7 +108,7 @@ public class StationInfoApi {
     }
 
     //// 9999개만 저장 test용
-    public List<StationInfoDto> callStationInfoApiForJsonTest() {
+    public List<StationInfoDto> callStationInfoApiForTest() {
 //        List<StationInfoDto> apiDtoList = new ArrayList<>();
         String urlBuilder = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
                 + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
@@ -154,7 +155,7 @@ public class StationInfoApi {
 
     // StationInfoUpdate를 반환하는 API 호출 메소드 (JSON)
     // TODO: 얘 쓸거임
-    public List<StationInfoUpdateDto> callStationInfoApiForUpdateForTest(int totalCount) {
+    public List<StationInfoUpdateDto> callStationInfoApiForUpdate(int totalCount) {
         String urlBuilder = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
                 + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
                 + "&pageNo=1" /*페이지번호*/
@@ -199,44 +200,60 @@ public class StationInfoApi {
         } catch (Exception e) {
             throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
         }
+    }
 
- /*       long start = System.currentTimeMillis();
-        List<StationInfoUpdateDto> apiDto = new ArrayList<>();
+    // 9999개를 갱신하는 메소드 (테스트용)
+    public List<StationInfoUpdateDto> callStationInfoApiForUpdateTest() {
+        String urlBuilder = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
+                + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
+                + "&pageNo=1" /*페이지번호*/
+                + "&numOfRows=9999" /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+                + "&dataType=JSON";
 
-        String url = *//*URL*//* "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
-                + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=" + keyInfo.getServerKey() *//*Service Key*//*
-                + "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("1", StandardCharsets.UTF_8) *//*페이지번호*//*
-                + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("9999", StandardCharsets.UTF_8);  *//*한 페이지 결과 수 (최소 10, 최대 9999)*//*
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlBuilder))
+                .build();
+
+        CompletableFuture<HttpResponse<String>> future = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        CompletableFuture<List<StationInfoUpdateDto>> asyncDtoList = future.thenApply(HttpResponse::body)
+                .thenApplyAsync(result -> {
+                    List<StationInfoUpdateDto> apiDtoList = new ArrayList<>();
+                    try {
+                        JSONParser jsonParser = new JSONParser();
+                        JSONObject parse = (JSONObject) jsonParser.parse(result);
+
+                        JSONObject items = (JSONObject) parse.get("items");
+                        JSONArray item = (JSONArray) items.get("item");
+
+                        for (int i = 0; i < item.size(); i++) {
+                            JSONObject jsonObject = (JSONObject) item.get(i);
+                            StationInfoUpdateDto stationInfo = getStationInfoUpdateDtoFromJson(jsonObject);
+                            apiDtoList.add(stationInfo);
+                        }
+                        log.info("dtoList size : {}", apiDtoList.size());
+                    } catch (Exception e) {
+                        throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+                    }
+                    return apiDtoList;
+                })
+                .exceptionally(ex -> {
+                    throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+                });
+
         try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document parse = dBuilder.parse(url);
-
-            parse.getDocumentElement().normalize();
-            NodeList nList = parse.getElementsByTagName("item");
-
-            for (int i = 0; i < nList.getLength(); i++) {
-                Node item = nList.item(i);
-                if (item.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) item;
-                    StationInfoUpdateDto dto = buildStationInfoUpdateDto(element);
-                    apiDto.add(dto);
-                }
-            }
-        } catch (IOException | ParserConfigurationException | SAXException e) {
-            e.printStackTrace();
+            return asyncDtoList.get();
+        } catch (Exception e) {
+            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
         }
-        long end = System.currentTimeMillis();
-        log.info("callStationInfoApiForUpdate : {}s", (float) (end - start) / 1000);
-        return apiDto;*/
     }
 
     //전체 갱신 XML
     //TODO: 삭제할 것
-    public List<List<StationInfoUpdateDto>> callStationInfoApiForUpdate() {
+    public List<List<StationInfoUpdateDto>> callStationInfoApiForUpdateXML() {
         List<List<StationInfoUpdateDto>> apiDtoList = new ArrayList<>();
         List<String> urlList = new ArrayList<>();
-        int totalCount = 345000;   //TODO: 삭제
+        int totalCount = 339657;   //TODO: 삭제
         int pageCount = (totalCount / 9999) + 1;
 
         for (int i = 1; i <= pageCount; i++) {
