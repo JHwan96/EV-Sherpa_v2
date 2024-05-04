@@ -39,6 +39,8 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 @Slf4j
@@ -54,19 +56,20 @@ public class StationInfoApi {
         int pageCount = (totalCount / 9999) + 1;
         log.info("totalCountJson : {}, pageCount : {}", totalCount, pageCount);
 
-        for(int i = 1; i < pageCount; i ++) {
+        for (int i = 1; i < pageCount+1; i++) {
             String tempStr = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
                     + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
-                    + "&pageNo="+i /*페이지번호*/
+                    + "&pageNo=" + i /*페이지번호*/
                     + "&numOfRows=9999" /*한 페이지 결과 수 (최소 10, 최대 9999)*/
                     + "&dataType=JSON";
             urlList.add(tempStr);
         }
 
         HttpClient httpClient = HttpClient.newHttpClient();
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
         List<CompletableFuture<List<StationInfoDto>>> futureList = new ArrayList<>();
 
-        for (String urlBuilder : urlList) {
+        /*for (String urlBuilder : urlList) {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(urlBuilder))
                     .build();
@@ -96,16 +99,53 @@ public class StationInfoApi {
                         throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
                     });
             futureList.add(asyncDtoList);
+        }*/
+
+
+        for (String urlBuilder : urlList) {
+            CompletableFuture<List<StationInfoDto>> asyncDtoList = CompletableFuture.supplyAsync(() -> {
+                try {
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(URI.create(urlBuilder))
+                            .build();
+                    HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                    JSONParser jsonParser = new JSONParser();
+                    JSONObject parse = (JSONObject) jsonParser.parse(response.body());
+
+                    JSONObject items = (JSONObject) parse.get("items");
+                    JSONArray item = (JSONArray) items.get("item");
+
+                    List<StationInfoDto> apiDtoList = new ArrayList<>();
+                    for (int j = 0; j < item.size(); j++) {
+                        JSONObject jsonObject = (JSONObject) item.get(j);
+                        StationInfoDto stationInfo = getStationInfoDtoFromJson(jsonObject);
+                        apiDtoList.add(stationInfo);
+                    }
+                    log.info("dtoList size : {}", apiDtoList.size());
+                    return apiDtoList;
+                } catch (Exception e) {
+                    throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+                }
+            }, executorService);
+
+            futureList.add(asyncDtoList);
         }
         CompletableFuture<Void> allOf = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));
         allOf.join();
 
-        for(CompletableFuture<List<StationInfoDto>> future : futureList){
-            apiDtoLists.add(future.join());
+        for (CompletableFuture<List<StationInfoDto>> future : futureList) {
+            try {
+                apiDtoLists.add(future.join());
+            } catch (Exception e) {
+                throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+            }
         }
+        executorService.shutdown();
 
         return apiDtoLists;
     }
+
 
     //// 9999개만 저장 test용
     public List<StationInfoDto> callStationInfoApiForTest() {
@@ -306,21 +346,21 @@ public class StationInfoApi {
         long start = System.currentTimeMillis();
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(urlBuilder);
-        try(CloseableHttpResponse response = httpClient.execute(httpGet)) {
+        try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
             String result = EntityUtils.toString(response.getEntity());
 
-            log.info("getTotalCountJson: {}s", (float)(System.currentTimeMillis() - start) / 1000);
+            log.info("getTotalCountJson: {}s", (float) (System.currentTimeMillis() - start) / 1000);
             try {
                 JSONParser jsonParser = new JSONParser();
                 JSONObject parse = (JSONObject) jsonParser.parse(result);
                 long totalCount = (long) parse.get("totalCount");
 
                 log.info("dtoList size : {}", totalCount);
-                return (int)totalCount;
+                return (int) totalCount;
             } catch (Exception e) {
                 throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
         }
     }
