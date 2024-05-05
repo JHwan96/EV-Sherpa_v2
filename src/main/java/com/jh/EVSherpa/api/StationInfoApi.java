@@ -39,8 +39,6 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Component
 @Slf4j
@@ -66,10 +64,9 @@ public class StationInfoApi {
         }
 
         HttpClient httpClient = HttpClient.newHttpClient();
-        ExecutorService executorService = Executors.newFixedThreadPool(5);
         List<CompletableFuture<List<StationInfoDto>>> futureList = new ArrayList<>();
 
-        /*for (String urlBuilder : urlList) {
+        for (String urlBuilder : urlList) {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(urlBuilder))
                     .build();
@@ -99,49 +96,13 @@ public class StationInfoApi {
                         throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
                     });
             futureList.add(asyncDtoList);
-        }*/
-
-
-        for (String urlBuilder : urlList) {
-            CompletableFuture<List<StationInfoDto>> asyncDtoList = CompletableFuture.supplyAsync(() -> {
-                try {
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(URI.create(urlBuilder))
-                            .build();
-                    HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                    JSONParser jsonParser = new JSONParser();
-                    JSONObject parse = (JSONObject) jsonParser.parse(response.body());
-
-                    JSONObject items = (JSONObject) parse.get("items");
-                    JSONArray item = (JSONArray) items.get("item");
-
-                    List<StationInfoDto> apiDtoList = new ArrayList<>();
-                    for (int j = 0; j < item.size(); j++) {
-                        JSONObject jsonObject = (JSONObject) item.get(j);
-                        StationInfoDto stationInfo = getStationInfoDtoFromJson(jsonObject);
-                        apiDtoList.add(stationInfo);
-                    }
-                    log.info("dtoList size : {}", apiDtoList.size());
-                    return apiDtoList;
-                } catch (Exception e) {
-                    throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
-                }
-            }, executorService);
-
-            futureList.add(asyncDtoList);
         }
         CompletableFuture<Void> allOf = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));
         allOf.join();
 
         for (CompletableFuture<List<StationInfoDto>> future : futureList) {
-            try {
-                apiDtoLists.add(future.join());
-            } catch (Exception e) {
-                throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
-            }
+            apiDtoLists.add(future.join());
         }
-        executorService.shutdown();
 
         return apiDtoLists;
     }
