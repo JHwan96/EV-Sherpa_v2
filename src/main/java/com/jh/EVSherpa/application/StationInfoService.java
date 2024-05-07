@@ -19,8 +19,8 @@ public class StationInfoService {
     private final StationInfoApi stationInfoApi;
     private final StationInfoRepository stationInfoRepository;
 
-    // 충전소 정보 9999개 저장 테스트용)
-    public int saveStationInfoForPageTest() {
+        // 충전소 정보 9999개 저장 테스트용)
+        public int saveStationInfoForPageTest() {
         // api 호출 - StationInfo
         long start = System.currentTimeMillis();
         List<StationInfoDto> stationInfoDtos = stationInfoApi.callStationInfoApiForTest();
@@ -53,7 +53,7 @@ public class StationInfoService {
     public int updateStationInfo() {
         // api 호출 - StationInfo
         int totalCount = stationInfoApi.callApiForTotalCount();
-        List<List<StationInfoUpdateDto>> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdateXML();
+        List<List<StationInfoUpdateDto>> stationInfoUpdateDtos = stationInfoApi.callStationInfoApiForUpdate(totalCount);
         log.info("{}",stationInfoUpdateDtos.size());
         // stationInfo 정보 갱신
         return stationInfoRepository.updateAllList(stationInfoUpdateDtos);

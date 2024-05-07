@@ -47,14 +47,14 @@ public class StationInfoApi {
     KeyInfo keyInfo;
 
     //TODO: 사용할 것 (JSON)
-    // 전체 저장
+    //전체 저장
     public List<List<StationInfoDto>> callAllStationInfoApi(int totalCount) {
         List<List<StationInfoDto>> apiDtoLists = new ArrayList<>();
         List<String> urlList = new ArrayList<>();
         int pageCount = (totalCount / 9999) + 1;
         log.info("totalCountJson : {}, pageCount : {}", totalCount, pageCount);
 
-        for (int i = 1; i < pageCount+1; i++) {
+        for (int i = 1; i < pageCount + 1; i++) {
             String tempStr = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
                     + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
                     + "&pageNo=" + i /*페이지번호*/
@@ -108,7 +108,8 @@ public class StationInfoApi {
     }
 
 
-    //// 9999개만 저장 test용
+    // 9999개만 저장
+    //TODO: test용
     public List<StationInfoDto> callStationInfoApiForTest() {
 //        List<StationInfoDto> apiDtoList = new ArrayList<>();
         String urlBuilder = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
@@ -156,51 +157,65 @@ public class StationInfoApi {
 
     // StationInfoUpdate를 반환하는 API 호출 메소드 (JSON)
     // TODO: 얘 쓸거임
-    public List<StationInfoUpdateDto> callStationInfoApiForUpdate(int totalCount) {
-        String urlBuilder = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
-                + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
-                + "&pageNo=1" /*페이지번호*/
-                + "&numOfRows=9999" /*한 페이지 결과 수 (최소 10, 최대 9999)*/
-                + "&dataType=JSON";
-        int totalCountJson = totalCount;
-        log.info("totalCountJson : {}", totalCountJson);
+    public List<List<StationInfoUpdateDto>> callStationInfoApiForUpdate(int totalCount) {
+        int pageCount = (totalCount / 9999) + 1;
+        List<List<StationInfoUpdateDto>> apiDtoLists = new ArrayList<>();
+        List<String> urlList = new ArrayList<>();
+
+        for (int i = 1; i < pageCount + 1; i++) {
+            String tempStr = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
+                    + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
+                    + "&pageNo=" + i /*페이지번호*/
+                    + "&numOfRows=9999" /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+                    + "&dataType=JSON";
+            urlList.add(tempStr);
+        }
+
+        log.info("totalCount : {}", totalCount);
 
         HttpClient httpClient = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlBuilder))
-                .build();
+        List<CompletableFuture<List<StationInfoUpdateDto>>> futureList = new ArrayList<>();
 
-        CompletableFuture<HttpResponse<String>> future = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-        CompletableFuture<List<StationInfoUpdateDto>> asyncDtoList = future.thenApply(HttpResponse::body)
-                .thenApplyAsync(result -> {
-                    List<StationInfoUpdateDto> apiDtoList = new ArrayList<>();
-                    try {
-                        JSONParser jsonParser = new JSONParser();
-                        JSONObject parse = (JSONObject) jsonParser.parse(result);
+        for (String urlBuilder : urlList) {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(urlBuilder))
+                    .build();
 
-                        JSONObject items = (JSONObject) parse.get("items");
-                        JSONArray item = (JSONArray) items.get("item");
+            CompletableFuture<HttpResponse<String>> future = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+            CompletableFuture<List<StationInfoUpdateDto>> asyncDtoList = future.thenApply(HttpResponse::body)
+                    .thenApplyAsync(result -> {
+                        List<StationInfoUpdateDto> apiDtoList = new ArrayList<>();
+                        try {
+                            JSONParser jsonParser = new JSONParser();
+                            JSONObject parse = (JSONObject) jsonParser.parse(result);
 
-                        for (int i = 0; i < item.size(); i++) {
-                            JSONObject jsonObject = (JSONObject) item.get(i);
-                            StationInfoUpdateDto stationInfo = getStationInfoUpdateDtoFromJson(jsonObject);
-                            apiDtoList.add(stationInfo);
+                            JSONObject items = (JSONObject) parse.get("items");
+                            JSONArray item = (JSONArray) items.get("item");
+
+                            for (int i = 0; i < item.size(); i++) {
+                                JSONObject jsonObject = (JSONObject) item.get(i);
+                                StationInfoUpdateDto stationInfo = getStationInfoUpdateDtoFromJson(jsonObject);
+                                apiDtoList.add(stationInfo);
+                            }
+                            log.info("dtoList size : {}", apiDtoList.size());
+                        } catch (Exception e) {
+                            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
                         }
-                        log.info("dtoList size : {}", apiDtoList.size());
-                    } catch (Exception e) {
+                        return apiDtoList;
+                    })
+                    .exceptionally(ex -> {
                         throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
-                    }
-                    return apiDtoList;
-                })
-                .exceptionally(ex -> {
-                    throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
-                });
-
-        try {
-            return asyncDtoList.get();
-        } catch (Exception e) {
-            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+                    });
+            futureList.add(asyncDtoList);
         }
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));
+        allOf.join();
+
+        for(CompletableFuture<List<StationInfoUpdateDto>> future : futureList) {
+            apiDtoLists.add(future.join());
+        }
+        return apiDtoLists;
+
     }
 
     // 9999개를 갱신하는 메소드 (테스트용)
@@ -380,41 +395,6 @@ public class StationInfoApi {
                 .deleteYn(getStringFromJson(jsonObject, "delYn"))
                 .deleteDetail(getStringFromJson(jsonObject, "delDetail"))
                 .trafficYn(getStringFromJson(jsonObject, "trafficYn"))
-                .build();
-    }
-
-    //ChargerInfoDto 생성 메서드
-    private StationInfoDto buildStationInfoDto(Element element) {
-        return StationInfoDto.builder()
-                .stationName(getTextFromTag(element, "statNm"))
-                .stationChargerId(getTextFromTag(element, "statId") + getTextFromTag(element, "chgerId"))
-                .chargerType(ChargerType.of(getTextFromTag(element, "chgerType")))
-                .address(getTextFromTag(element, "addr"))
-                .location(getTextFromTag(element, "location"))
-                .position(getPositionFromString(getTextFromTag(element, "lat"), getTextFromTag(element, "lng")))
-                .useTime(getTextFromTag(element, "useTime"))
-                .businessId(getTextFromTag(element, "busiId"))
-                .businessName(getTextFromTag(element, "bnm"))
-                .operatorName(getTextFromTag(element, "busiNm"))
-                .operatorCall(getTextFromTag(element, "busiCall"))
-                .status(ChargerStatus.of(getTextFromTag(element, "stat")))
-                .stationUpdateDate(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "statUpdDt")))
-                .lastChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "lastTsdt")))
-                .lastChargeEnd(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "lastTedt")))
-                .nowChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "nowTsdt")))
-                .output(stringToInteger(element, "output"))
-                .chargerMethod(ChargerMethod.of(getTextFromTag(element, "method")))
-                .zcode(getTextFromTag(element, "zcode"))
-                .zscode(getTextFromTag(element, "zscode"))
-                .kind(getTextFromTag(element, "kind"))
-                .kindDetail(getTextFromTag(element, "kindDetail"))
-                .parkingFree(getTextFromTag(element, "parkingFree"))
-                .notation(getTextFromTag(element, "note"))
-                .limitYn(getTextFromTag(element, "limitYn"))
-                .limitDetail(getTextFromTag(element, "limitDetail"))
-                .deleteYn(getTextFromTag(element, "delYn"))
-                .deleteDetail(getTextFromTag(element, "delDetail"))
-                .trafficYn(getTextFromTag(element, "trafficYn"))
                 .build();
     }
 

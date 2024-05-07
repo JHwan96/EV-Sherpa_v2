@@ -31,7 +31,11 @@ public class StationInfoController {    // TODO: IP 제한
     // update api 강제 호출 (사용자 ㅍ X)
     @PutMapping("/update")
     public ResponseEntity<Integer> updateStationInfo() {
+        long start = System.currentTimeMillis();
         int updateCount = stationInfoService.updateStationInfo();
+        long end = System.currentTimeMillis();
+        log.info("time : {}s", (float)(end-start)/1000);
+
         return ResponseEntity.ok(updateCount);
     }
 

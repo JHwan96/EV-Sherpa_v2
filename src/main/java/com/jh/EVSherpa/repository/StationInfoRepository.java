@@ -108,6 +108,7 @@ public class StationInfoRepository {
         for (List<StationInfoUpdateDto> requests : requestList) {
             int count = 0;
             for (StationInfoUpdateDto request : requests) {
+
                 int i = em.createQuery(JPQL)
                         .setParameter("chargerType", request.getChargerType())
                         .setParameter("useTime", request.getUseTime())
@@ -126,6 +127,7 @@ public class StationInfoRepository {
                 count += i;
             }
             totalCount += count;
+            log.info("updateAllList 실행:{}", count);
         }
         log.info("update count : {}", totalCount);
         return totalCount;
