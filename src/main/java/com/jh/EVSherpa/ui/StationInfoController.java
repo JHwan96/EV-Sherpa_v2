@@ -4,6 +4,7 @@ import com.jh.EVSherpa.application.StationInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,11 @@ public class StationInfoController {    // TODO: IP 제한
         return ResponseEntity.ok(stationInfoSize);
     }
 
+    @GetMapping("/find/all")
+    public ResponseEntity<Integer> findAllStationInfo() {
+        int allStationInfo = stationInfoService.findAllStationInfo();
+        return ResponseEntity.ok(allStationInfo);
+    }
 
     // update api 강제 호출 (사용자 ㅍ X)
     @PutMapping("/update")
@@ -42,7 +48,11 @@ public class StationInfoController {    // TODO: IP 제한
     // 전체 정보 update 강제 호출 (사용자 사용 X)
     @PutMapping("/update/all")
     public ResponseEntity<Integer> updateStationAllInfo() {
+        long start = System.currentTimeMillis();
         int updateCount = stationInfoService.updateStationAllInfo();
+        long end = System.currentTimeMillis();
+        log.info("time : {}s", (float)(end-start)/1000);
+        log.info("updateCount All : {}", updateCount);
         return ResponseEntity.ok(updateCount);
     }
 

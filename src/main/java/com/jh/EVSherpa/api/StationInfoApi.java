@@ -22,16 +22,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -264,51 +255,6 @@ public class StationInfoApi {
         }
     }
 
-    //전체 갱신 XML
-    //TODO: 삭제할 것
-    public List<List<StationInfoUpdateDto>> callStationInfoApiForUpdateXML() {
-        List<List<StationInfoUpdateDto>> apiDtoList = new ArrayList<>();
-        List<String> urlList = new ArrayList<>();
-        int totalCount = 339657;   //TODO: 삭제
-        int pageCount = (totalCount / 9999) + 1;
-
-        for (int i = 1; i <= pageCount; i++) {
-            String temp = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo"
-                    + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
-                    + "&pageNo=" + i // 페이지번호
-                    + "&numOfRows=9999";  // 한 페이지 결과 수 (최소 10, 최대 9999)
-            urlList.add(temp);
-        }
-
-        try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-
-            for (int i = 0; i < 20/*urlList.size()*/; i++) {
-                log.info("Start : {}번째", i);
-                String url = urlList.get(i);
-                List<StationInfoUpdateDto> tempDto = new ArrayList<>();
-
-                Document parse = dBuilder.parse(url);
-                parse.getDocumentElement().normalize();
-                NodeList nList = parse.getElementsByTagName("item");
-
-                for (int j = 0; j < nList.getLength(); j++) {
-                    Node item = nList.item(j);
-                    if (item.getNodeType() == Node.ELEMENT_NODE) {
-                        Element element = (Element) item;
-                        StationInfoUpdateDto dto = buildStationInfoUpdateDto(element);
-                        tempDto.add(dto);
-                    }
-                }
-                apiDtoList.add(tempDto);
-            }
-            log.info("Dto transform END");
-        } catch (IOException | ParserConfigurationException | SAXException e) {
-            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
-        }
-        return apiDtoList;
-    }
 
     // 전체 개수 반환 (9999개 기준)
     // TODO: 사용할 것
@@ -359,7 +305,7 @@ public class StationInfoApi {
                 .lastChargeStart(DateTimeUtils.dateTimeFormat(getStringFromJson(jsonObject, "lastTsdt")))
                 .lastChargeEnd(DateTimeUtils.dateTimeFormat(getStringFromJson(jsonObject, "lastTedt")))
                 .nowChargeStart(DateTimeUtils.dateTimeFormat(getStringFromJson(jsonObject, "nowTsdt")))
-                .output(stringToIntegerJson(jsonObject, "output"))
+                .output(stringToIntegerFromJson(jsonObject, "output"))
                 .chargerMethod(ChargerMethod.of(getStringFromJson(jsonObject, "method")))
                 .zcode(getStringFromJson(jsonObject, "zcode"))
                 .zscode(getStringFromJson(jsonObject, "zscode"))
@@ -387,7 +333,7 @@ public class StationInfoApi {
                 .lastChargeStart(DateTimeUtils.dateTimeFormat(getStringFromJson(jsonObject, "lastTsdt")))
                 .lastChargeEnd(DateTimeUtils.dateTimeFormat(getStringFromJson(jsonObject, "lastTedt")))
                 .nowChargeStart(DateTimeUtils.dateTimeFormat(getStringFromJson(jsonObject, "nowTsdt")))
-                .output(stringToIntegerJson(jsonObject, "output"))
+                .output(stringToIntegerFromJson(jsonObject, "output"))
                 .parkingFree(getStringFromJson(jsonObject, "parkingFree"))
                 .notation(getStringFromJson(jsonObject, "note"))
                 .limitYn(getStringFromJson(jsonObject, "limitYn"))
@@ -398,43 +344,11 @@ public class StationInfoApi {
                 .build();
     }
 
-    private StationInfoUpdateDto buildStationInfoUpdateDto(Element element) {
-        return StationInfoUpdateDto.builder()
-                .stationChargerId(getTextFromTag(element, "statId") + getTextFromTag(element, "chgerId"))
-                .chargerType(ChargerType.of(getTextFromTag(element, "chgerType")))
-                .useTime(getTextFromTag(element, "useTime"))
-                .operatorName(getTextFromTag(element, "busiNm"))
-                .operatorCall(getTextFromTag(element, "busiCall"))
-                .output(stringToInteger(element, "output"))
-                .status(ChargerStatus.of(getTextFromTag(element, "stat")))
-                .stationUpdateDate(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "statUpdDt")))
-                .lastChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "lastTsdt")))
-                .lastChargeEnd(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "lastTedt")))
-                .nowChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(element, "nowTsdt")))
-                .parkingFree(getTextFromTag(element, "parkingFree"))
-                .notation(getTextFromTag(element, "note"))
-                .limitYn(getTextFromTag(element, "limitYn"))
-                .limitDetail(getTextFromTag(element, "limitDetail"))
-                .deleteYn(getTextFromTag(element, "delYn"))
-                .deleteDetail(getTextFromTag(element, "delDetail"))
-                .trafficYn(getTextFromTag(element, "trafficYn"))
-                .build();
-    }
-
     private String getStringFromJson(JSONObject jsonObject, String key) {
         return (String) jsonObject.get(key);
     }
 
-    private Integer stringToInteger(Element element, String tag) {
-        String output = getTextFromTag(element, tag);
-        if (output.isEmpty()) {
-            return null;
-        } else {
-            return Integer.parseInt(output);
-        }
-    }
-
-    private Integer stringToIntegerJson(JSONObject jsonObject, String key) {
+    private Integer stringToIntegerFromJson(JSONObject jsonObject, String key) {
         String output = getStringFromJson(jsonObject, key);
         if (output.isEmpty()) {
             return null;
@@ -443,15 +357,11 @@ public class StationInfoApi {
         }
     }
 
-    private String getTextFromTag(Element element, String tag) {
-        return element.getElementsByTagName(tag).item(0).getTextContent();
-    }
-
-    private Point getPositionFromString(String latitude, String longitude) { //TODO: Utility로 이동 고려
+    private Point getPositionFromString(String latitude, String longitude) {
         GeometryFactory geometryFactory = new GeometryFactory();
         double lat = Double.parseDouble(latitude);
         double lng = Double.parseDouble(longitude);
-        Point point = geometryFactory.createPoint(new Coordinate(lng, lat));        // 변경 해봐야할 부분
+        Point point = geometryFactory.createPoint(new Coordinate(lng, lat));    // lng, lat 순
         int SRID = 4326;
         point.setSRID(SRID);
 

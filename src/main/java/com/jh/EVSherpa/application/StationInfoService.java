@@ -1,6 +1,7 @@
 package com.jh.EVSherpa.application;
 
 import com.jh.EVSherpa.api.StationInfoApi;
+import com.jh.EVSherpa.domain.StationInfo;
 import com.jh.EVSherpa.dto.StationInfoDto;
 import com.jh.EVSherpa.dto.StationInfoUpdateDto;
 import com.jh.EVSherpa.repository.StationInfoRepository;
@@ -64,7 +65,12 @@ public class StationInfoService {
     public int updateStationAllInfo() {
         int totalCount = stationInfoApi.callApiForTotalCount();
         List<List<StationInfoDto>> stationInfoDtos = stationInfoApi.callAllStationInfoApi(totalCount);
-        List<StationInfoDto> tempStationInfoDtos = stationInfoDtos.get(0);
-        return stationInfoRepository.updateAllInfo(tempStationInfoDtos);
+        return stationInfoRepository.updateAllInfo(stationInfoDtos);
+    }
+
+    //테스트용 findAll
+    public int findAllStationInfo(){
+        List<StationInfo> all = stationInfoRepository.findAll();
+        return all.size();
     }
 }
