@@ -100,7 +100,7 @@ public class StationInfoApi {
 
 
     // 9999개만 저장
-    //TODO: test용
+    //test용
     public List<StationInfoDto> callStationInfoApiForTest() {
 //        List<StationInfoDto> apiDtoList = new ArrayList<>();
         String urlBuilder = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
@@ -147,7 +147,6 @@ public class StationInfoApi {
     }
 
     // StationInfoUpdate를 반환하는 API 호출 메소드 (JSON)
-    // TODO: 얘 쓸거임
     public List<List<StationInfoUpdateDto>> callStationInfoApiForUpdate(int totalCount) {
         int pageCount = (totalCount / 9999) + 1;
         List<List<StationInfoUpdateDto>> apiDtoLists = new ArrayList<>();

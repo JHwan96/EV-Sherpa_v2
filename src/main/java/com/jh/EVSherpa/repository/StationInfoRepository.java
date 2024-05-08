@@ -60,14 +60,23 @@ public class StationInfoRepository {
                 .orElseThrow(() -> new NotFoundException("적절한 충전소 정보가 없습니다."));
     }
 
-    // 전체 find 메서드
-    public List<StationInfo> findAll() {
+    // 전체 stationChargerId find 메서드
+    public List<String> findAllStationChargerId() {
         long start = System.currentTimeMillis();
-        List<StationInfo> findAll = em.createQuery("SELECT si FROM StationInfo si", StationInfo.class)
+        List<String> resultList = em.createQuery("SELECT si.stationChargerId FROM StationInfo si", String.class)
                 .getResultList();
         long end = System.currentTimeMillis();
         log.info("findAll time : {}s", (float)(end-start)/1000);
-        return findAll;
+        return resultList;
+    }
+
+    public List<StationInfo> findAll() {
+        long start = System.currentTimeMillis();
+        List<StationInfo> resultList = em.createQuery("SELECT si FROM StationInfo si", StationInfo.class)
+                .getResultList();
+        long end = System.currentTimeMillis();
+        log.info("findAll time : {}s", (float)(end-start)/1000);
+        return resultList;
     }
 
     String JPQL = "UPDATE StationInfo si SET " +
@@ -106,6 +115,12 @@ public class StationInfoRepository {
         }
         log.info("update count : {}", count);
         return count;
+    }
+
+    public int addUpdateList(List<StationInfoDto> requests){
+        requests.stream()
+                .map(m -> m.getStationChargerId());
+        return 1;
     }
 
     public int updateAllList(List<List<StationInfoUpdateDto>> requestList) {
@@ -173,15 +188,6 @@ public class StationInfoRepository {
         for(List<StationInfoDto> requests : requestList) {
             int count = 0;
             for (StationInfoDto request : requests) {
-                List<StationInfo> stationInfoList = em.createQuery("SELECT si FROM StationInfo si WHERE si.stationChargerId = :stationChargerId", StationInfo.class)
-                        .setParameter("stationChargerId", request.getStationChargerId())
-                        .getResultList();
-                if(stationInfoList.isEmpty()){
-                    saveList.add(request);
-                    log.info("new Station!");
-                    continue;
-                }
-
                 int i = em.createQuery(jpql)
                         .setParameter("stationName", request.getStationName())
                         .setParameter("stationChargerId", request.getStationChargerId())
@@ -214,10 +220,6 @@ public class StationInfoRepository {
             totalCount += count;
         }
         log.info("update count : {}", totalCount);
-        if(!saveList.isEmpty()) {
-            saveAll(saveList);
-            log.info("SaveAll : {}", saveList.size());
-        }
         return totalCount;
     }
 

@@ -28,6 +28,15 @@ public class StationInfoController {    // TODO: IP 제한
         return ResponseEntity.ok(stationInfoSize);
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<Integer> test() {
+        long start = System.currentTimeMillis();
+        stationInfoService.addNewStationInfo();
+        long end = System.currentTimeMillis();
+        log.info("time : {}s", (float)(end-start)/1000);
+        return ResponseEntity.ok(1);
+    }
+
     @GetMapping("/find/all")
     public ResponseEntity<Integer> findAllStationInfo() {
         int allStationInfo = stationInfoService.findAllStationInfo();
