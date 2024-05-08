@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -69,23 +71,29 @@ public class StationInfoService {
     }
 
     //테스트
-    public void addNewStationInfo() {
+    public void addNewStationInfo() throws InterruptedException {
         int totalCount = stationInfoApi.callApiForTotalCount(); // 전체 개수 반환
         List<StationInfoDto> saveStationInfoDto = new ArrayList<>();
         List<String> stationChargerIdFromRepo = stationInfoRepository.findAllStationChargerId();
 
         List<List<StationInfoDto>> stationInfoDtoList = stationInfoApi.callAllStationInfoApi(totalCount);//TODO: List<String> 반환하는 것을 따로만들지 고민
-        log.info("callAllStationInfoApi Done");
+        log.info("callAllStationInfoApi Done:{}, {}", stationInfoDtoList.size(), stationInfoDtoList.get(20).size());
+
 
         List<String> stationChargerIdFromApi = stationInfoDtoList.stream()
                 .flatMap(List::stream)
                 .map(StationInfoDto::getStationChargerId)
                 .toList();
-        log.info("stream 1번 Done");
 
-        List<String> missingList = stationChargerIdFromApi.stream().filter(x -> !stationChargerIdFromRepo.contains(x)).toList();
-        log.info("stream 2번 Done");
+        Set<String> StationInfoSetFromRepo = new HashSet<>(stationChargerIdFromRepo);
+
+        // 새로 추가된 전기차 충전소만 확인
+        List<String> missingList = stationChargerIdFromApi.stream()
+                .filter(x -> !StationInfoSetFromRepo.contains(x))
+                .toList();
+
         log.info("missingList : {}", missingList.size());
+
         //TODO: 비교 후 saveAll
     }
 

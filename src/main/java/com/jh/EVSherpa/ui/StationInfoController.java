@@ -29,7 +29,7 @@ public class StationInfoController {    // TODO: IP 제한
     }
 
     @GetMapping("/test")
-    public ResponseEntity<Integer> test() {
+    public ResponseEntity<Integer> test() throws InterruptedException {
         long start = System.currentTimeMillis();
         stationInfoService.addNewStationInfo();
         long end = System.currentTimeMillis();
