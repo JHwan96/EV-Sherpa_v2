@@ -3,7 +3,6 @@ package com.jh.EVSherpa.ui;
 import com.jh.EVSherpa.application.StationInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,57 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class StationInfoController {    // TODO: IP 제한
     private final StationInfoService stationInfoService;
 
-    // save api 강제 호출 (사용자 사용 X)
-    // TODO: IP Blocking
-    @PostMapping("/save")
-    public ResponseEntity<Integer> saveStationInfoFromApi() {
-        long start = System.currentTimeMillis();
-        int stationInfoSize = stationInfoService.saveStationInfo();
-        long end = System.currentTimeMillis();
-        log.info("time : {}s", (float)(end-start)/1000);
-
-        return ResponseEntity.ok(stationInfoSize);
-    }
-
-    // 추가된 충전소 정보 추가
-    // TODO: IP Blocking
-    @PutMapping("/sync")
-    public ResponseEntity<Void> sync() {
-        long start = System.currentTimeMillis();
-        stationInfoService.deleteAndSaveStationInfo();
-        long end = System.currentTimeMillis();
-        log.info("time : {}s", (float)(end-start)/1000);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
     @GetMapping("/find/all")
     public ResponseEntity<Integer> findAllStationInfo() {
         int allStationInfo = stationInfoService.findAllStationInfo();
         return ResponseEntity.ok(allStationInfo);
-    }
-
-    // update api 강제 호출 (사용자 ㅍ X)
-    // TODO: IP Blocking
-    @PutMapping("/update")
-    public ResponseEntity<Integer> updateStationInfo() {
-        long start = System.currentTimeMillis();
-        int updateCount = stationInfoService.updateStationInfo();
-        long end = System.currentTimeMillis();
-        log.info("time : {}s", (float)(end-start)/1000);
-
-        return ResponseEntity.ok(updateCount);
-    }
-
-    // 전체 정보 update 강제 호출 (사용자 사용 X)
-    // TODO: IP Blocking
-    @PutMapping("/update/all")
-    public ResponseEntity<Integer> updateStationAllInfo() {
-        long start = System.currentTimeMillis();
-        int updateCount = stationInfoService.updateStationAllInfo();
-        long end = System.currentTimeMillis();
-        log.info("time : {}s", (float)(end-start)/1000);
-        log.info("updateCount All : {}", updateCount);
-        return ResponseEntity.ok(updateCount);
     }
 
     // 한 페이지만 저장 (9999개 테스트용)
