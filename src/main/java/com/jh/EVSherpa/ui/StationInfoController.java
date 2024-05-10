@@ -3,6 +3,7 @@ package com.jh.EVSherpa.ui;
 import com.jh.EVSherpa.application.StationInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,13 +32,13 @@ public class StationInfoController {    // TODO: IP 제한
 
     // 추가된 충전소 정보 추가
     // TODO: IP Blocking
-    @GetMapping("/test")
-    public ResponseEntity<Integer> test() throws InterruptedException {
+    @PutMapping("/sync")
+    public ResponseEntity<Void> sync() {
         long start = System.currentTimeMillis();
         stationInfoService.deleteAndSaveStationInfo();
         long end = System.currentTimeMillis();
         log.info("time : {}s", (float)(end-start)/1000);
-        return ResponseEntity.ok(1);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/find/all")

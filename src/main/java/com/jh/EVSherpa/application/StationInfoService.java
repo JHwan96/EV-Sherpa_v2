@@ -56,8 +56,8 @@ public class StationInfoService {
         return stationInfoRepository.saveAllList(stationInfoDtos);
     }
 
-    // 충전소 정보 update 메서드  (사용자 사용 X)
-    //TODO: scheduling
+    // 충전소 일부 정보 update 메서드  (사용자 사용 X)
+    //TODO: scheduling, 삭제 여부 확인
     public int updateStationInfo() {
         // api 호출 - StationInfo
         int totalCount = stationInfoApi.callApiForTotalCount();
@@ -100,31 +100,37 @@ public class StationInfoService {
         deleteRemovedStationInfo(stationChargerIdSetFromRepo, stationInfoDtos);
     }
 
-
-
     // 새로 추가된 StationInfo 저장 메서드
     private void saveNewStationInfo(Set<String> setFromRepo, List<StationInfoDto> stationInfoDtoList) {
+        int saveCount = 0;
         Set<String> setFromApi = getStationChargerIdSetFromDtoList(stationInfoDtoList);
         Set<String> missingSet = diffFromFirstParam(setFromApi, setFromRepo);
-
-        List<StationInfoDto> needToSaveDtoList = stationInfoDtoList.stream()
-                .filter(x -> missingSet.contains(x.getStationChargerId()))
-                .toList();
-
-        log.info("needToSaveDtoList : {}", needToSaveDtoList.size());
-
-//        stationInfoRepository.saveAll(needToSaveDtoList);
+        if (!missingSet.isEmpty()) {
+            List<StationInfoDto> needToSaveDtoList = stationInfoDtoFromMissingSet(stationInfoDtoList, missingSet);
+            log.info("needToSaveDtoList : {}", needToSaveDtoList.size());
+            saveCount = stationInfoRepository.saveAll(needToSaveDtoList);
+        }
+        log.info("saveAll : {}", saveCount);
     }
 
+    private static List<StationInfoDto> stationInfoDtoFromMissingSet(List<StationInfoDto> stationInfoDtoList, Set<String> missingSet) {
+        return stationInfoDtoList.stream()
+                .filter(x -> missingSet.contains(x.getStationChargerId()))
+                .toList();
+    }
 
     private void deleteRemovedStationInfo(Set<String> setFromRepo, List<StationInfoDto> stationInfoDtos) {
+        int deleteCount = 0;
         Set<String> setFromApi = getStationChargerIdSetFromDtoList(stationInfoDtos);
 
         //DB엔 있고, API 호출에는 없는 StationChargerId
         Set<String> deleteSet = diffFromFirstParam(setFromRepo, setFromApi);
         log.info("deleteSet : {}", deleteSet.size());
 
-        stationInfoRepository.deleteByAllStationChargerId(deleteSet);
+        if (!deleteSet.isEmpty()) {
+            deleteCount = stationInfoRepository.deleteByAllStationChargerId(deleteSet);
+        }
+        log.info("deleteByAllStationChargerId : {}", deleteCount);
     }
 
     /**
@@ -136,7 +142,6 @@ public class StationInfoService {
     }
 
     //api에 없는 것만 Set으로 (차집합)
-    @NotNull
     private static Set<String> diffFromFirstParam(Set<String> setFromApi, Set<String> setFromRepo) {
         return setFromApi.stream()
                 .filter(x -> !setFromRepo.contains(x))
