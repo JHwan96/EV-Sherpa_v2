@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -229,6 +230,12 @@ public class StationInfoRepository {
         StationInfo stationInfo = findId.orElseThrow(() -> new NotFoundException("적절한 StationInfo가 없습니다."));
         em.remove(stationInfo);
         return stationInfo;
+    }
+
+    public int deleteByAllStationChargerId(Set<String> stationChargerIdList){
+        return em.createQuery("DELETE FROM StationInfo si where si.stationChargerId IN :stationChargerIdList")
+                .setParameter("stationChargerIdList", stationChargerIdList)
+                .executeUpdate();
     }
 
     private StationInfo save(StationInfoDto request) {

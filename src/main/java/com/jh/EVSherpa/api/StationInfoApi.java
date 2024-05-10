@@ -98,7 +98,6 @@ public class StationInfoApi {
         return apiDtoLists;
     }
 
-
     // 9999개만 저장
     //test용
     public List<StationInfoDto> callStationInfoApiForTest() {
@@ -254,9 +253,7 @@ public class StationInfoApi {
         }
     }
 
-
     // 전체 개수 반환 (9999개 기준)
-    // TODO: 사용할 것
     public int callApiForTotalCount() {
         String urlBuilder = "http://apis.data.go.kr/B552584/EvCharger/getChargerInfo" /*URL*/
                 + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/

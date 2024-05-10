@@ -18,6 +18,7 @@ public class StationInfoController {    // TODO: IP 제한
     private final StationInfoService stationInfoService;
 
     // save api 강제 호출 (사용자 사용 X)
+    // TODO: IP Blocking
     @PostMapping("/save")
     public ResponseEntity<Integer> saveStationInfoFromApi() {
         long start = System.currentTimeMillis();
@@ -28,10 +29,12 @@ public class StationInfoController {    // TODO: IP 제한
         return ResponseEntity.ok(stationInfoSize);
     }
 
+    // 추가된 충전소 정보 추가
+    // TODO: IP Blocking
     @GetMapping("/test")
     public ResponseEntity<Integer> test() throws InterruptedException {
         long start = System.currentTimeMillis();
-        stationInfoService.addNewStationInfo();
+        stationInfoService.deleteAndSaveStationInfo();
         long end = System.currentTimeMillis();
         log.info("time : {}s", (float)(end-start)/1000);
         return ResponseEntity.ok(1);
@@ -44,6 +47,7 @@ public class StationInfoController {    // TODO: IP 제한
     }
 
     // update api 강제 호출 (사용자 ㅍ X)
+    // TODO: IP Blocking
     @PutMapping("/update")
     public ResponseEntity<Integer> updateStationInfo() {
         long start = System.currentTimeMillis();
@@ -55,6 +59,7 @@ public class StationInfoController {    // TODO: IP 제한
     }
 
     // 전체 정보 update 강제 호출 (사용자 사용 X)
+    // TODO: IP Blocking
     @PutMapping("/update/all")
     public ResponseEntity<Integer> updateStationAllInfo() {
         long start = System.currentTimeMillis();
@@ -73,7 +78,8 @@ public class StationInfoController {    // TODO: IP 제한
         return ResponseEntity.ok(stationInfoSize);
     }
 
-    // update api 강제 호출 (사용자 ㅍ X)
+    // update api 강제 호출 (9999개 테스트용)
+    //TODO: 삭제해야함
     @PutMapping("/update/test")
     public ResponseEntity<Integer> updateStationInfoForTest() {
         int updateCount = stationInfoService.updateStationInfoForPageTest();

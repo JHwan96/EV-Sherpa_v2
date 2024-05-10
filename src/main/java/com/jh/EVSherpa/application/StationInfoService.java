@@ -6,13 +6,14 @@ import com.jh.EVSherpa.dto.StationInfoUpdateDto;
 import com.jh.EVSherpa.repository.StationInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -23,6 +24,7 @@ public class StationInfoService {
     private final StationInfoRepository stationInfoRepository;
 
     // 충전소 정보 9999개 저장 테스트용)
+    // TODO: 삭제 해야함
     public int saveStationInfoForPageTest() {
         // api 호출 - StationInfo
         long start = System.currentTimeMillis();
@@ -33,7 +35,8 @@ public class StationInfoService {
         return stationInfoRepository.saveAll(stationInfoDtos);
     }
 
-    // 충전소 N개만 갱신 (테스트용)
+    // 충전소 정보 9999개 update 테스트용)
+    // TODO: 삭제 해야함
     public int updateStationInfoForPageTest() {
         // api 호출 - StationInfo
         long start = System.currentTimeMillis();
@@ -43,6 +46,7 @@ public class StationInfoService {
     }
 
     // StationInfoApi 호출 및 저장 메서드 (사용자 사용 X)
+    //TODO: scheduling
     public int saveStationInfo() {
         // api 호출 - StationInfo
         int totalCount = stationInfoApi.callApiForTotalCount();
@@ -53,6 +57,7 @@ public class StationInfoService {
     }
 
     // 충전소 정보 update 메서드  (사용자 사용 X)
+    //TODO: scheduling
     public int updateStationInfo() {
         // api 호출 - StationInfo
         int totalCount = stationInfoApi.callApiForTotalCount();
@@ -62,44 +67,90 @@ public class StationInfoService {
         return stationInfoRepository.updateAllList(stationInfoUpdateDtos);
     }
 
+    //테스트용 findAll
+    //TODO: 사용에 따라 변경해야함
+    @Transactional(readOnly = true)
+    public int findAllStationInfo() {
+        List<String> all = stationInfoRepository.findAllStationChargerId();
+        return all.size();
+    }
 
-    // 충전소 정보 전체 update 메서드  (사용자 사용 X)
+    // DB 내의 충전소 정보 전체 update 메서드  (사용자 사용 X)
+    //TODO: scheduling
     public int updateStationAllInfo() {
         int totalCount = stationInfoApi.callApiForTotalCount();
         List<List<StationInfoDto>> stationInfoDtos = stationInfoApi.callAllStationInfoApi(totalCount);
         return stationInfoRepository.updateAllInfo(stationInfoDtos);
     }
 
-    //테스트
-    public void addNewStationInfo() throws InterruptedException {
+
+    //전체 동기화 메서드
+    public void deleteAndSaveStationInfo() {
         int totalCount = stationInfoApi.callApiForTotalCount(); // 전체 개수 반환
-        List<StationInfoDto> saveStationInfoDto = new ArrayList<>();
-        List<String> stationChargerIdFromRepo = stationInfoRepository.findAllStationChargerId();
+        log.info("total size:{}", totalCount);
 
-        List<List<StationInfoDto>> stationInfoDtoList = stationInfoApi.callAllStationInfoApi(totalCount);//TODO: List<String> 반환하는 것을 따로만들지 고민
-        log.info("callAllStationInfoApi Done:{}, {}", stationInfoDtoList.size(), stationInfoDtoList.get(20).size());
-
-
-        List<String> stationChargerIdFromApi = stationInfoDtoList.stream()
-                .flatMap(List::stream)
-                .map(StationInfoDto::getStationChargerId)
-                .toList();
-
-        Set<String> StationInfoSetFromRepo = new HashSet<>(stationChargerIdFromRepo);
+        Set<String> stationChargerIdSetFromRepo = new HashSet<>(stationInfoRepository.findAllStationChargerId());
+        List<List<StationInfoDto>> stationInfoDtoList = stationInfoApi.callAllStationInfoApi(totalCount);
+        List<StationInfoDto> stationInfoDtos = removeNestList(stationInfoDtoList);
 
         // 새로 추가된 전기차 충전소만 확인
-        List<String> missingList = stationChargerIdFromApi.stream()
-                .filter(x -> !StationInfoSetFromRepo.contains(x))
+        saveNewStationInfo(stationChargerIdSetFromRepo, stationInfoDtos);
+
+        // DB에 있지만, API 호출에는 없는 것 (철거된 것들)
+        deleteRemovedStationInfo(stationChargerIdSetFromRepo, stationInfoDtos);
+    }
+
+
+
+    // 새로 추가된 StationInfo 저장 메서드
+    private void saveNewStationInfo(Set<String> setFromRepo, List<StationInfoDto> stationInfoDtoList) {
+        Set<String> setFromApi = getStationChargerIdSetFromDtoList(stationInfoDtoList);
+        Set<String> missingSet = diffFromFirstParam(setFromApi, setFromRepo);
+
+        List<StationInfoDto> needToSaveDtoList = stationInfoDtoList.stream()
+                .filter(x -> missingSet.contains(x.getStationChargerId()))
                 .toList();
 
-        log.info("missingList : {}", missingList.size());
+        log.info("needToSaveDtoList : {}", needToSaveDtoList.size());
 
-        //TODO: 비교 후 saveAll
+//        stationInfoRepository.saveAll(needToSaveDtoList);
     }
 
-    //테스트용 findAll
-    public int findAllStationInfo() {
-        List<String> all = stationInfoRepository.findAllStationChargerId();
-        return all.size();
+
+    private void deleteRemovedStationInfo(Set<String> setFromRepo, List<StationInfoDto> stationInfoDtos) {
+        Set<String> setFromApi = getStationChargerIdSetFromDtoList(stationInfoDtos);
+
+        //DB엔 있고, API 호출에는 없는 StationChargerId
+        Set<String> deleteSet = diffFromFirstParam(setFromRepo, setFromApi);
+        log.info("deleteSet : {}", deleteSet.size());
+
+        stationInfoRepository.deleteByAllStationChargerId(deleteSet);
     }
+
+    /**
+     * 중첩 리스트 한겹을 없애는 메서드
+     */
+    @NotNull
+    private static List<StationInfoDto> removeNestList(List<List<StationInfoDto>> stationInfoDtoList) {
+        return stationInfoDtoList.stream().flatMap(List::stream).toList();
+    }
+
+    //api에 없는 것만 Set으로 (차집합)
+    @NotNull
+    private static Set<String> diffFromFirstParam(Set<String> setFromApi, Set<String> setFromRepo) {
+        return setFromApi.stream()
+                .filter(x -> !setFromRepo.contains(x))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * StationInfoDto 리스트에서 stationChargerId만 추출해서 Set으로 반환
+     */
+    @NotNull
+    private static Set<String> getStationChargerIdSetFromDtoList(List<StationInfoDto> stationInfoDtoList) {
+        return stationInfoDtoList.stream()
+                .map(StationInfoDto::getStationChargerId)
+                .collect(Collectors.toSet());
+    }
+
 }
