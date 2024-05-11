@@ -46,7 +46,6 @@ public class StationInfoService {
     }
 
     // StationInfoApi 호출 및 저장 메서드 (사용자 사용 X)
-    //TODO: scheduling
     public int saveStationInfo() {
         // api 호출 - StationInfo
         int totalCount = stationInfoApi.callApiForTotalCount();
@@ -76,7 +75,7 @@ public class StationInfoService {
     }
 
     // DB 내의 충전소 정보 전체 update 메서드  (사용자 사용 X)
-    //TODO: scheduling
+    // 3시간에 한번씩
     public int updateStationAllInfo() {
         int totalCount = stationInfoApi.callApiForTotalCount();
         List<List<StationInfoDto>> stationInfoDtos = stationInfoApi.callAllStationInfoApi(totalCount);
@@ -85,6 +84,7 @@ public class StationInfoService {
 
 
     //전체 동기화 메서드
+    //하루 2번
     public void deleteAndSaveStationInfo() {
         int totalCount = stationInfoApi.callApiForTotalCount(); // 전체 개수 반환
         log.info("total size:{}", totalCount);

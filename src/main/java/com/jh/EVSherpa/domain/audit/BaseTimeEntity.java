@@ -1,4 +1,4 @@
-package com.jh.EVSherpa.global.jpa;
+package com.jh.EVSherpa.domain.audit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

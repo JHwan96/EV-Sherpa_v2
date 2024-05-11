@@ -1,7 +1,7 @@
 package com.jh.EVSherpa.domain;
 
 import com.jh.EVSherpa.dto.UserRequestDto;
-import com.jh.EVSherpa.global.jpa.BaseTimeEntity;
+import com.jh.EVSherpa.domain.audit.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
