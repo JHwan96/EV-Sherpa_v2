@@ -6,22 +6,19 @@ import com.jh.EVSherpa.exception.ApiProblemException;
 import com.jh.EVSherpa.global.config.KeyInfo;
 import com.jh.EVSherpa.global.utility.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 @Slf4j
@@ -31,51 +28,61 @@ public class StationStatusApi {
 
     //충전소 상태 정보 반환 API
     public List<StationStatusDto> callStationStatusApi() {
-        List<StationStatusDto> apiDto = new ArrayList<>();
-
         String url = /*URL*/ "http://apis.data.go.kr/B552584/EvCharger/getChargerStatus"
-                + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=" + keyInfo.getServerKey() /*Service Key*/
-                + "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("1", StandardCharsets.UTF_8) /*페이지 번호*/
-                + "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("9999", StandardCharsets.UTF_8) /*한 페이지 결과 수 (최소 10, 최대 9999)*/
-                + "&" + URLEncoder.encode("period", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("3", StandardCharsets.UTF_8); /*상태갱신 조회 범위(분) (기본값 5, 최소 1, 최대 10)*/
-//                    + "&" + URLEncoder.encode("zcode", "UTF-8") + "=" + URLEncoder.encode("11", "UTF-8"); /*시도 코드 (행정구역코드 앞 2자리)*/
+                + "?serviceKey=" + keyInfo.getServerKey() /*Service Key*/
+                + "&pageNo=1" /*페이지 번호*/
+                + "&numOfRows=9999" /*한 페이지 결과 수 (최소 10, 최대 9999)*/
+                + "&period=3" /*상태갱신 조회 범위(분) (기본값 5, 최소 1, 최대 10)*/
+                + "&dataType=JSON";
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+
+        CompletableFuture<HttpResponse<String>> future = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        CompletableFuture<List<StationStatusDto>> asyncDtoList = future.thenApply(HttpResponse::body)
+                .thenApplyAsync(result -> {
+                    List<StationStatusDto> apiDtoList = new ArrayList<>();
+                    try {
+                        JSONParser jsonParser = new JSONParser();
+                        JSONObject parse = (JSONObject) jsonParser.parse(result);
+                        long totalCount = (long) parse.get("totalCount");
+                        log.info("StationStatus totalCount : {}", totalCount);
+
+                        JSONObject items = (JSONObject) parse.get("items");
+                        JSONArray item = (JSONArray) items.get("item");
+
+                        for (int i = 0; i < item.size(); i++) {
+                            JSONObject jsonObject = (JSONObject) item.get(i);
+                            StationStatusDto stationStatus = buildStationStatusDtoFromJson(jsonObject);
+                            apiDtoList.add(stationStatus);
+                        }
+                        log.info("StationStatusDto size : {}", apiDtoList);
+                    } catch (Exception e) {
+                        throw new ApiProblemException("상태정보 API 호출에 문제가 발생했습니다.");
+                    }
+                    return apiDtoList;
+                });
         try {
-            DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dbuilder = dbfactory.newDocumentBuilder();
-            Document parse = dbuilder.parse(url);
-
-            parse.getDocumentElement().normalize();
-            NodeList nList = parse.getElementsByTagName("item");
-
-            for (int i = 0; i < nList.getLength(); i++) {
-                Node item = nList.item(i);
-                if (item.getNodeType() == Node.ELEMENT_NODE) {
-                    Element e = (Element) item;
-
-                    StationStatusDto check = buildStationStatusDto(e);
-                    apiDto.add(check);
-                }
-            }
-        } catch (IOException | ParserConfigurationException | SAXException e) {
-           throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+            return asyncDtoList.join();
+        } catch(Exception e){
+            throw new ApiProblemException("상태정보 API 호출에 문제가 발생했습니다.");
         }
-        log.info("apiDto size : {}", apiDto.size());
-        return apiDto;
     }
 
-    private StationStatusDto buildStationStatusDto(Element e) {
+    private StationStatusDto buildStationStatusDtoFromJson(JSONObject o) {
         return StationStatusDto.builder()
-                .businessId(getTextFromTag(e, "busiId"))
-                .stationChargerId(getTextFromTag(e, "statId") + getTextFromTag(e, "chgerId"))
-                .status(ChargerStatus.of(getTextFromTag(e, "stat")))
-                .stationUpdateDate(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "statUpdDt")))
-                .lastChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "lastTsdt")))
-                .lastChargeEnd(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "lastTedt")))
-                .nowChargeStart(DateTimeUtils.dateTimeFormat(getTextFromTag(e, "nowTsdt")))
+                .businessId(getStringFromJson(o, "busiId"))
+                .stationChargerId(getStringFromJson(o, "statId") + getStringFromJson(o, "chgerId"))
+                .status(ChargerStatus.of(getStringFromJson(o, "stat")))
+                .stationUpdateDate(DateTimeUtils.dateTimeFormat(getStringFromJson(o,"statUpdDt")))
+                .lastChargeStart(DateTimeUtils.dateTimeFormat(getStringFromJson(o, "lastTsdt")))
+                .lastChargeEnd(DateTimeUtils.dateTimeFormat(getStringFromJson(o, "lastTedt")))
+                .nowChargeStart(DateTimeUtils.dateTimeFormat(getStringFromJson(o, "nowTsdt")))
                 .build();
     }
 
-    private String getTextFromTag(Element element, String tag) {
-        return element.getElementsByTagName(tag).item(0).getTextContent();
+    private String getStringFromJson(JSONObject jsonObject, String tag) {
+        return (String) jsonObject.get(tag);
     }
 }

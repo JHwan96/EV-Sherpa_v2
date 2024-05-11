@@ -238,18 +238,18 @@ public class StationInfoApi {
                         }
                         log.info("dtoList size : {}", apiDtoList.size());
                     } catch (Exception e) {
-                        throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+                        throw new ApiProblemException("충전소 정보 API 호출에 문제가 발생했습니다.");
                     }
                     return apiDtoList;
                 })
                 .exceptionally(ex -> {
-                    throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+                    throw new ApiProblemException("충전소 정보 API 호출에 문제가 발생했습니다.");
                 });
 
         try {
             return asyncDtoList.get();
         } catch (Exception e) {
-            throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
+            throw new ApiProblemException("충전소 정보 API 호출에 문제가 발생했습니다.");
         }
     }
 
