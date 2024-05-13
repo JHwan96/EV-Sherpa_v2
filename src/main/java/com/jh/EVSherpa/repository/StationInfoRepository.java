@@ -148,7 +148,6 @@ public class StationInfoRepository {
                 count += i;
             }
             totalCount += count;
-            log.info("updateAllList 실행:{}", count);
         }
         log.info("update count : {}", totalCount);
         return totalCount;

@@ -106,9 +106,12 @@ public class StationInfoService {
         Set<String> setFromApi = getStationChargerIdSetFromDtoList(stationInfoDtoList);
         Set<String> missingSet = diffFromFirstParam(setFromApi, setFromRepo);
         if (!missingSet.isEmpty()) {
+            for(String missing : missingSet){
+                log.info("saveStationChargerId: {}", missing);
+            }
             List<StationInfoDto> needToSaveDtoList = stationInfoDtoFromMissingSet(stationInfoDtoList, missingSet);
             log.info("needToSaveDtoList : {}", needToSaveDtoList.size());
-            saveCount = stationInfoRepository.saveAll(needToSaveDtoList);
+//            saveCount = stationInfoRepository.saveAll(needToSaveDtoList);
         }
         log.info("saveAll : {}", saveCount);
     }
@@ -126,9 +129,12 @@ public class StationInfoService {
         //DB엔 있고, API 호출에는 없는 StationChargerId
         Set<String> deleteSet = diffFromFirstParam(setFromRepo, setFromApi);
         log.info("deleteSet : {}", deleteSet.size());
+        for(String delete : deleteSet){
+            log.info("deleteStationChargerId:{}", delete);
+        }
 
         if (!deleteSet.isEmpty()) {
-            deleteCount = stationInfoRepository.deleteByAllStationChargerId(deleteSet);
+//            deleteCount = stationInfoRepository.deleteByAllStationChargerId(deleteSet);
         }
         log.info("deleteByAllStationChargerId : {}", deleteCount);
     }

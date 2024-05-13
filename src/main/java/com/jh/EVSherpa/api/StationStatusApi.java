@@ -57,7 +57,7 @@ public class StationStatusApi {
                             StationStatusDto stationStatus = buildStationStatusDtoFromJson(jsonObject);
                             apiDtoList.add(stationStatus);
                         }
-                        log.info("StationStatusDto size : {}", apiDtoList);
+                        log.info("StationStatusDto size : {}", apiDtoList.size());
                     } catch (Exception e) {
                         throw new ApiProblemException("상태정보 API 호출에 문제가 발생했습니다.");
                     }

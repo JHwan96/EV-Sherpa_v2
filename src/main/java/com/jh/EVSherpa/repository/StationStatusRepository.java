@@ -76,6 +76,7 @@ public class StationStatusRepository {
 
     // 전체 update 메서드
     public int updateAll(List<StationStatusDto> requests) {
+        log.info("updateAll start");
         int count = 0;
         String jpql = "UPDATE StationStatus ss SET " +
                 "ss.status = :status, " +
@@ -90,11 +91,14 @@ public class StationStatusRepository {
                     .setParameter("stationUpdateDate", request.getStationUpdateDate())
                     .setParameter("lastChargeStart", request.getLastChargeStart())
                     .setParameter("lastChargeEnd", request.getLastChargeEnd())
-                    .setParameter("nowChargerStart", request.getNowChargeStart())
+                    .setParameter("nowChargeStart", request.getNowChargeStart())
                     .setParameter("stationChargerId", request.getStationChargerId())
                     .executeUpdate();
+            log.info("count : {}", count);
             count += i;
         }
+        em.flush();
+        em.clear();
         log.info("update count : {}", count);
         return count;
     }

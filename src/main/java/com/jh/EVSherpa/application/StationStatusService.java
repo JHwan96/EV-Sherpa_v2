@@ -21,17 +21,15 @@ public class StationStatusService {
 
     //StationStatus 호출 및 저장 메서드 (처음 저장할 때만 사용)
     public List<StationStatus> saveStationStatus() {
-        // api 호출 - StationStatus
-        List<StationStatusDto> stationStatusDtos = stationStatusApi.callStationStatusApi();
-        // 데이터 저장
-        return stationStatusRepository.saveAll(stationStatusDtos);
+
+        List<StationStatusDto> stationStatusDtos = stationStatusApi.callStationStatusApi(); // api 호출 - StationStatus
+
+        return stationStatusRepository.saveAll(stationStatusDtos);  // 데이터 저장
     }
 
     //StationStatus update 메서드
     public int updateStationStatus() {
-        // api 호출
-        List<StationStatusDto> stationStatusDtos = stationStatusApi.callStationStatusApi();
-        // 데이터 update
+        List<StationStatusDto> stationStatusDtos = stationStatusApi.callStationStatusApi(); // api 호출
         return stationStatusRepository.updateAll(stationStatusDtos);
     }
 }

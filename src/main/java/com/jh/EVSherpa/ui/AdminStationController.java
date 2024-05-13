@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/admin/station")
+@RequestMapping("/api/admin/station")
 public class AdminStationController {
     private final StationInfoService stationInfoService;
     private final StationStatusService stationStatusService;
@@ -33,7 +33,7 @@ public class AdminStationController {
     }
 
     // 추가된 충전소 정보 추가
-    @PutMapping("/sync")
+    @PutMapping("/info/sync")
     public ResponseEntity<Void> sync() {
         long start = System.currentTimeMillis();
         stationInfoService.deleteAndSaveStationInfo();
@@ -43,7 +43,7 @@ public class AdminStationController {
     }
 
     // update api 강제 호출
-    @PutMapping("/update")
+    @PutMapping("/info/update")
     public ResponseEntity<Integer> updateStationInfo() {
         long start = System.currentTimeMillis();
         int updateCount = stationInfoService.updateStationInfo();
@@ -54,7 +54,7 @@ public class AdminStationController {
     }
 
     // 전체 정보 update 강제 호출
-    @PutMapping("/update/all")
+    @PutMapping("/info/update/all")
     public ResponseEntity<Integer> updateStationAllInfo() {
         long start = System.currentTimeMillis();
         int updateCount = stationInfoService.updateStationAllInfo();

@@ -36,7 +36,7 @@ public class StationStatus {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "STATUS_SEQ_GENERATOR")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String stationChargerId;
 
     @Enumerated(value = EnumType.STRING)

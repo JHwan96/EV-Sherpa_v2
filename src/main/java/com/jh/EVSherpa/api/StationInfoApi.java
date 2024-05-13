@@ -77,7 +77,6 @@ public class StationInfoApi {
                                 StationInfoDto stationInfo = getStationInfoDtoFromJson(jsonObject);
                                 apiDtoList.add(stationInfo);
                             }
-                            log.info("dtoList size : {}", apiDtoList.size());
                         } catch (Exception e) {
                             throw new ApiProblemException("API 호출에 문제가 발생했습니다.");
                         }

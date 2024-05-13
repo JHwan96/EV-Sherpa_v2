@@ -23,5 +23,6 @@ public class StationStatusScheduler {
     public void updateStationStatus(){
         log.info("updateStationStatus task cron jobs");
         stationStatusService.updateStationStatus();
+        log.info("updateStationStatus Finish");
     }
 }
