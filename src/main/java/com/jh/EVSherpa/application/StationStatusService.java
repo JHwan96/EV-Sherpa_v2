@@ -20,11 +20,10 @@ public class StationStatusService {
     private final StationStatusRepository stationStatusRepository;
 
     //StationStatus 호출 및 저장 메서드 (처음 저장할 때만 사용)
-    public List<StationStatus> saveStationStatus() {
-
+    public int saveStationStatus() {
         List<StationStatusDto> stationStatusDtos = stationStatusApi.callStationStatusApi(); // api 호출 - StationStatus
-
-        return stationStatusRepository.saveAll(stationStatusDtos);  // 데이터 저장
+        List<StationStatus> saved = stationStatusRepository.saveAll(stationStatusDtos);// 데이터 저장
+        return saved.size();
     }
 
     //StationStatus update 메서드

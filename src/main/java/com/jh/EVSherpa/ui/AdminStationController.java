@@ -64,5 +64,12 @@ public class AdminStationController {
         return ResponseEntity.ok(updateCount);
     }
 
+    // StationStatus 강제 update
+    @PutMapping("/status/update")
+    public ResponseEntity<Integer> updateStationStatus() {
+        int updateCount = stationStatusService.updateStationStatus();
+        return ResponseEntity.ok(updateCount);
+    }
+
 }
 
