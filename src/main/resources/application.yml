@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: EV-Sherpa
+
+  profiles:
+    include:
+      - secret
+
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ev_sherpa?serverTimezone=Asia/Seoul&rewriteBatchedStatements=true
+    username: root
+    password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: create #none
+    properties:
+      hibernate:
+#        show_sql: true
+        order_inserts: true
+        jdbc:
+          batch_size: 100
+
+
+#  h2.console.enabled=true
+#  config.additional-location=classpath:application-secret.yml
+
